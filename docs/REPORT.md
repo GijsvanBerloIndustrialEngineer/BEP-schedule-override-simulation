@@ -6,7 +6,7 @@ This report reviews `src/simulation.py` as of commit `03c11fc` (`main`). It cove
 2. the errors and incorrect behaviour the simulation shows today,
 3. the parts that still have to be decided and improved.
 
-All claims about the code refer to `src/simulation.py` with line numbers. The figures about the input data come from the test calendar `diligent_anxious_active_0000.ics`, which is the default input (lines 19–21). Python was not available on the machine used for this review, so the figures were counted directly from the `.ics` file rather than from a script run. Arrival counts are therefore given as expected values, not as observed ones.
+All claims about the code refer to `src/simulation.py` with line numbers. The figures come from a run of the script on the default test calendar `diligent_anxious_active_0000.ics` (lines 19–21), with the default parameters λ = 0.4 per hour and seed 42. The run used Python 3.13.17, icalendar 7.3.0 and openpyxl 3.1.5. The arrival and busy-time figures in E2 and E5 were computed from the same run by reusing `load_calendar()` and `generate_triggers()`.
 
 ---
 
@@ -67,16 +67,26 @@ Effect on the metrics:
 | Metric | All events (current) | Tasks only |
 |---|---|---|
 | Total calendar events | 4,344 | 1,536 |
-| Total event duration | ≈ 3,370 h | ≈ 1,102 h |
-| Event-hours / simulation-hours | ≈ **2.50** | ≈ 0.82 |
+| Total event duration | 3,370.0 h | 1,102.2 h |
+| Average event duration | 0.78 h | 0.72 h |
+| Event-hours / simulation-hours | **2.50** | 0.82 |
 
-An occupancy of 2.5 suggests a calendar that is overbooked two and a half times. That figure is an artefact of mixing in the context annotations. The averages and the shortest/longest event are distorted in the same way. The simulation horizon also starts at a context annotation (`2026-07-06 00:00`) instead of at the first task.
+An occupancy of 2.5 suggests a calendar that is overbooked two and a half times. That figure is an artefact of mixing in the context annotations. The averages and the shortest/longest event are distorted in the same way. The simulation horizon also starts at a context annotation (`2026-07-06 00:00`) instead of at the first task (`00:20`).
 
 **Fix:** split the events into *tasks* and *context* when loading, for example on the `[ctx:` prefix or on `CATEGORIES`. Compute the task metrics on tasks only. Keep the context events as a separate input, because they are exactly what the later *task context* model needs.
 
 ### E2. Arrivals fall in free time and during sleep (high impact for the next step)
 
-Arrivals are spread uniformly over the whole horizon (lines 156–168). With λ = 0.4 per hour over a horizon of about 1,348 h, about **539** arrivals are expected. `sleep` takes 6 h a day, so roughly a quarter of those land while the persona is asleep, and many more land in gaps between tasks. The conceptual model states that free time has **no override chance**, yet nothing in the code links an arrival to a task. Once the override logic is added, most arrivals will either do nothing or need a rule to map them to a task.
+Arrivals are spread uniformly over the whole horizon (lines 156–168). The horizon is 1,348.3 h, so λ = 0.4 per hour gives about 539 expected arrivals. The run produced **525**, an observed rate of 0.389 per hour. Where they land:
+
+| Arrivals land in… | Count | Share |
+|---|---|---|
+| `sleep` | 133 | 25 % |
+| free time (no task active) | 118 | 22 % |
+| an awake task | 275 | 52 % |
+| …of which two or more tasks are active at once | 13 | 2 % |
+
+The conceptual model states that free time has **no override chance**, yet nothing in the code links an arrival to a task. Once the override logic is added, almost half of the arrivals will either do nothing or need a rule. The 13 arrivals that land during overlapping tasks also need a rule for which task they hit (D2). Arrivals hit long tasks more often than short ones, simply because they last longer. That is a modelling choice in its own right, not a neutral default.
 
 ### E3. Notifications cannot be modelled from the input
 
@@ -88,7 +98,7 @@ The test calendar has **no `UID` and no `STATUS`** on any event. Both columns in
 
 ### E5. Overlapping events inflate occupancy
 
-Even among the planned tasks alone, about 410 tasks start before the previous task has ended. The occupancy ratio adds up durations (line 187) instead of measuring the union of busy time, so overlaps are counted twice. The same applies to all-day events, which count as 24 h each because `DTEND` is the next day (lines 42–43 and 96–100).
+Even among the planned tasks alone, about 410 tasks start before the previous task has ended. The occupancy ratio adds up durations (line 187) instead of measuring the union of busy time, so overlaps are counted twice. For the tasks, the sum of durations is 1,102.2 h, but the union of busy time is only 1,043.3 h. The same applies to all-day events, which count as 24 h each because `DTEND` is the next day (lines 42–43 and 96–100).
 
 ### E6. Invalid data is silently hidden
 
