@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Input calendars and simulation output
+data/*
+!data/.gitkeep
+*.ics
+*.xlsx
+~$*.xlsx
