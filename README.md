@@ -16,6 +16,8 @@ The current version (`src/simulation.py`):
 
 Not yet implemented: persona-dependent override logic, plan updating, and exporting the executed calendar.
 
+For a full explanation of how the simulation works, see the **[manual](MANUAL.md)**.
+
 ## Installation
 
 Requires Python 3.9+.
@@ -44,6 +46,7 @@ Simulation parameters (arrival rate, random seed) are set in `main()`.
 │   └── simulation.py     # Simulation: load calendar, generate arrivals, metrics, Excel export
 ├── data/                 # Put input .ics files here (not tracked by git)
 ├── requirements.txt
+├── MANUAL.md             # How the simulation works
 └── README.md
 ```
 
