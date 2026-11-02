@@ -17,6 +17,7 @@ The current version (`src/simulation.py`):
 Not yet implemented: persona-dependent override logic, plan updating, and exporting the executed calendar.
 
 For a full explanation of how the simulation works, see the **[manual](MANUAL.md)**.
+For the target design of the full simulation loop, see the **[conceptual model](docs/CONCEPTUAL_MODEL.md)**.
 
 ## Installation
 
@@ -45,6 +46,9 @@ Simulation parameters (arrival rate, random seed) are set in `main()`.
 ├── src/
 │   └── simulation.py     # Simulation: load calendar, generate arrivals, metrics, Excel export
 ├── data/                 # Put input .ics files here (not tracked by git)
+├── docs/
+│   ├── CONCEPTUAL_MODEL.md  # Target design: event-driven override loop
+│   └── images/              # Original hand-drawn sketch
 ├── requirements.txt
 ├── MANUAL.md             # How the simulation works
 └── README.md
