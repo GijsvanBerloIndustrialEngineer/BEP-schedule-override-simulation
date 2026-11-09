@@ -6,6 +6,8 @@ This report reviews `src/simulation.py` as of commit `03c11fc` (`main`). It cove
 2. the errors and incorrect behaviour the simulation shows today,
 3. the parts that still have to be decided and improved.
 
+> **Update (version 1, branch `feature/override-simulation`).** Sections 1–3 describe the code as of commit `03c11fc` and are kept as the starting point. Section 4 lists the design decisions taken for version 1, how they are implemented, and which errors from section 2 are now solved.
+
 All claims about the code refer to `src/simulation.py` with line numbers. The figures about the input data come from the test calendar `diligent_anxious_active_0000.ics`, which is the default input (lines 19–21). Python was not available on the machine used for this review, so the figures were counted directly from the `.ics` file rather than from a script run. Arrival counts are therefore given as expected values, not as observed ones.
 
 ---
@@ -168,3 +170,65 @@ These choices decide the shape of the model. Each comes with options and a sugge
 15. Choose and document one timezone policy, for example converting to `Europe/Amsterdam` explicitly (E8).
 16. Unit tests for loading, Poisson arrivals (observed rate close to λ over long horizons), the override draw and calendar updates.
 17. Validation: compare the simulated override rates with values from the literature, or with real plan-versus-actual data if it becomes available.
+
+---
+
+## 4. Decisions taken and status (version 1)
+
+### 4.1 Design decisions D1–D15
+
+| # | Decision taken | Implementation |
+|---|---|---|
+| D1 | Poisson arrivals trigger override events | `generate_arrivals()`; λ in `override_config.yaml` (`arrivals.rate_per_hour`, 0.4) |
+| D2 | The arrival acts on the active task; arrivals in free time and during sleep are ignored | `run_replication()`; ignored arrivals are counted per reason |
+| D3 | Multinomial probability per action | Multinomial logit over {none, postpone, skip, replace}, "none" as reference (`action_probabilities()`) |
+| D4 | Logistic, with a small rule-based part | Rules: exclusion list, postponement cap (1 per task), postponement without a free slot becomes a skip |
+| D5 | Earlier overrides **lower** the chance of a next override | Coefficient −0.40 per earlier override, counted over the same day, capped at 3 |
+| D6 | Planned hours left in the day as the fill measure | Union of time-blocking task hours from the arrival to midnight, without sleep |
+| D7 | Postpone to the next free slot on the same day | Search from the planned end on the 10-min grid, within 06:00–22:00, no overlap, respecting 22 temporal rules from `temporal_relation_rules.yaml`; otherwise skip |
+| D8 | Replace with a generic `UNPLANNED` block of the same length | The remaining part of the task becomes `UNPLANNED` |
+| D9 | Explicit exclusion list | Events `sleep`, `napping`, `wake_up`, `go_to_bed`, `breakfast`, `lunch`, `dinner`, `snacking`, `drink_water`, `meeting`; labels `standup`, `external meeting`. The meals are excluded. |
+| D10 | A share q of tasks is notified, drawn at random | `notification_share` (0.5), drawn per task per replication |
+| D11 | Separate `[ctx:...]` events now, use them in version 2 | Kept as context events; used by the temporal rules and exported to the Context sheet |
+| D12 | Both an executed `.ics` and a change list | `<calendar>_executed_run1.ics` and the Changes sheet |
+| D13 | Completion rate; shares postponed / skipped / replaced; mean postponement delay; plan–execution deviation | `replication_kpis()`; definitions in the manual, section 8 |
+| D14 | R replications with confidence intervals | R = 30, seeds `base_seed + r`, 95% t-interval per KPI |
+| D15 | Parameter sets per persona | `override_model.personas` in the config; persona read from the person id |
+
+All probabilities and coefficients are **assumptions** and are listed in `config/override_config.yaml`. They still have to be supported by literature or a sensitivity analysis.
+
+### 4.2 Status of the errors from section 2
+
+| # | Status in version 1 |
+|---|---|
+| E1 | **Solved.** Context annotations are separated from tasks; metrics use tasks only |
+| E2 | **Solved by D2.** Arrivals in free time, during sleep or during excluded tasks are ignored and counted |
+| E3 | **Worked around by D10.** Notifications are a parameter; the data still has no alarms |
+| E4 | **Solved.** Synthetic ids `evt-<number>`; every executed block keeps its origin task id |
+| E5 | **Partly.** The fill measure (D6) uses the union of busy time; the plan metric *task-hours / simulation-hours* is still a sum |
+| E6 | Open. Negative durations are still clamped to 0 without a warning |
+| E7 | Open. Recurring events are not expanded (calendar-bench files have none) |
+| E8 | Open. Timezone conversion depends on the computer (calendar-bench files use floating times) |
+| E9 | a, b, d, f, g, h **solved** (unused code removed, separate random streams, config file and command-line options, error shown once, metrics redefined); e solved by removing the metric; c open (default input path) |
+
+### 4.3 First results (test calendar)
+
+`diligent_anxious_active_0000.ics`, default parameters with the `diligent_anxious_active` set, λ = 0.4, R = 30:
+
+| KPI | Mean | 95% CI |
+|---|---|---|
+| Completion rate (eligible tasks) | 0.953 | [0.950, 0.956] |
+| Share postponed | 0.017 | [0.015, 0.018] |
+| Share skipped | 0.039 | [0.036, 0.042] |
+| Share replaced | 0.008 | [0.006, 0.010] |
+| Mean postponement delay (hours) | 1.68 | [1.39, 1.97] |
+| Plan–execution deviation (hours) | 30.2 | [28.0, 32.3] |
+
+More than half of the drawn postponements (on average 10.5 per run, against about 8 successful ones) find no free slot on the same day and become a skip. Of the ~551 arrivals per run, about 140 lead to an override decision; the rest fall in free time, sleep or excluded tasks. These numbers follow directly from the assumed parameters and are only a check that the model works, not a result.
+
+### 4.4 Next steps
+
+1. Support the parameters with literature and run a sensitivity analysis (λ, base probabilities, coefficients, q).
+2. Version 2: task context (`[ctx:...]` energy state, mood, location) and persona characteristics as inputs of the probability.
+3. Simulate the scenario (health) tasks from calendar-bench `scenarios.yaml`, for example the `human_coach` schedules, and compare completion per planning method.
+

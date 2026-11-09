@@ -1,5 +1,4 @@
 import sys
-import random
 import argparse
 from pathlib import Path
 from datetime import datetime, date, timedelta
@@ -16,9 +15,15 @@ from calendar_bench_link import (
     enrich_task,
     parse_context_event,
     persona_characteristics,
-    time_window_of,
-    in_daily_window,
 )
+from override_model import parameters_for, intercepts, is_eligible, ACTIONS
+from override_simulation import (
+    run_replication,
+    replication_kpis,
+    summarise_kpis,
+)
+from executed_calendar import write_executed_ics
+from rules import parse_rules
 
 
 # ============================================================
@@ -32,8 +37,6 @@ DEFAULT_ICS_FILE = Path(
     r"C:\Users\20234396\OneDrive - TU Eindhoven\Industrial Engineering Year 4\BEP\Internal BEP Assignment\Icalendars\diligent_anxious_active_0000.ics"
 )
 
-OUTPUT_FILENAME = "calendar_simulation_metrics.xlsx"
-
 
 def parse_arguments(argv=None):
     parser = argparse.ArgumentParser(
@@ -46,6 +49,10 @@ def parse_arguments(argv=None):
     parser.add_argument(
         "--config", type=Path, default=DEFAULT_OVERRIDE_CONFIG,
         help="override_config.yaml (default: config/override_config.yaml)",
+    )
+    parser.add_argument(
+        "--replications", type=int, default=None,
+        help="number of replications (overrides the config)",
     )
     return parser.parse_args(argv)
 
@@ -96,8 +103,8 @@ def load_calendar(file_path, experiment):
     calendar-bench writes two kinds of events into one .ics file:
     planned tasks (breakfast, meeting, sleep, ...) and context annotations
     ('[ctx:location] home', '[ctx:energy_state] tired', ...). They are
-    returned separately: (tasks, context_events). Each task is matched to
-    the event catalog and persona of the experiment.
+    returned separately: (tasks, context_events) (D11). Each task is matched
+    to the event catalog and persona of the experiment.
     """
     if not file_path.exists():
         raise FileNotFoundError(
@@ -153,17 +160,13 @@ def load_calendar(file_path, experiment):
         if context is not None:
             record["context_category"], record["context_value"] = context
             context_events.append(record)
-        else:
+        elif end is not None:
             tasks.append(enrich_task(record, experiment))
 
     tasks.sort(key=lambda task: task["start"])
     context_events.sort(key=lambda item: item["start"])
     return tasks, context_events
 
-
-# ============================================================
-# 4. GENERATE POISSON ARRIVALS
-# ============================================================
 
 def calendar_horizon(tasks):
     """First start to last end of the planned tasks."""
@@ -174,455 +177,306 @@ def calendar_horizon(tasks):
     return min(valid_starts), max(valid_ends)
 
 
-def active_tasks_at(moment, tasks):
-    """Planned tasks (no sleep markers) running at a given moment."""
-    return [
-        task for task in tasks
-        if not task.get("is_marker")
-        and task["start"] and task["end"]
-        and task["start"] <= moment < task["end"]
-    ]
-
-
-def generate_triggers(tasks, simulation_start, simulation_end,
-                      experiment, rate_per_hour=0.4, seed=42):
-    """
-    Generate Poisson arrivals between simulation_start and simulation_end.
-
-    rate_per_hour = expected number of arrivals per hour.
-
-    Each arrival is labelled with the experiment's time window, whether it
-    falls inside the waking window (daily_window) of environment.yaml, and
-    the planned tasks active at that moment. The arrivals do not change the
-    calendar yet.
-    """
-    if rate_per_hour <= 0:
-        raise ValueError("rate_per_hour must be greater than zero.")
-
-    if simulation_start is None or simulation_end is None:
-        return []
-
-    if simulation_end <= simulation_start:
-        return []
-
-    # Own random stream, so later random draws do not shift the arrivals
-    rng = random.Random(seed)
-
-    triggers = []
-    current_time = simulation_start
-
-    while True:
-        # Exponential inter-arrival time for a Poisson process
-        interarrival_hours = rng.expovariate(rate_per_hour)
-        current_time += timedelta(hours=interarrival_hours)
-
-        if current_time >= simulation_end:
-            break
-
-        active = active_tasks_at(current_time, tasks)
-        triggers.append({
-            "time": current_time,
-            "type": "POISSON_ARRIVAL",
-            "summary": "Calendar-wide arrival",
-            "time_window": time_window_of(
-                current_time, experiment["time_windows"]
-            ),
-            "in_daily_window": in_daily_window(
-                current_time, experiment["daily_window"]
-            ),
-            "active_tasks": ", ".join(task["label"] for task in active),
-        })
-
-    return triggers
-
-
 # ============================================================
-# 5. CALCULATE METRICS
+# 4. PLAN METRICS
 # ============================================================
 
-def calculate_metrics(tasks, context_events, triggers, simulation_start,
-                      simulation_end, rate_per_hour, experiment,
-                      horizon_source):
-    """Calculate summary metrics for the planned tasks and the simulation."""
-
-    durations = [
-        task["duration_hours"]
-        for task in tasks
-        if task["duration_hours"] is not None
-    ]
-
+def plan_metrics(tasks, context_events, horizon, experiment, horizon_source,
+                 params, params_source, rate_per_hour, replications):
+    """Description of the planned calendar and of the run settings."""
+    durations = [t["duration_hours"] for t in tasks
+                 if t["duration_hours"] is not None]
     total_task_hours = sum(durations)
-    number_of_events = len(tasks)
-    events_with_duration = len(durations)
-
-    if simulation_start and simulation_end:
-        simulation_hours = max(
-            0, (simulation_end - simulation_start).total_seconds() / 3600
-        )
-    else:
-        simulation_hours = 0
-
-    observed_rate = (
-        len(triggers) / simulation_hours
-        if simulation_hours > 0 else 0
+    start, end = horizon
+    simulation_hours = (
+        max(0, (end - start).total_seconds() / 3600) if start and end else 0
     )
-
-    average_interarrival = (
-        simulation_hours / len(triggers)
-        if triggers else None
-    )
-
-    average_duration = (
-        total_task_hours / events_with_duration
-        if events_with_duration else None
-    )
-
-    shortest_task = min(
-        (task for task in tasks
-         if task["duration_hours"] and not task.get("is_marker")),
-        key=lambda task: task["duration_hours"],
-        default=None,
-    )
-
-    longest_task = max(
-        (task for task in tasks
-         if task["duration_hours"] is not None),
-        key=lambda task: task["duration_hours"],
-        default=None,
-    )
-
-    occupancy_ratio = (
-        total_task_hours / simulation_hours
-        if simulation_hours > 0 else None
-    )
-
     persons = sorted({t["person_id"] for t in tasks if t.get("person_id")})
     personas = sorted({t["persona"] for t in tasks if t.get("persona")})
-    not_in_catalog = sorted({
-        t["event"] for t in tasks if not t.get("in_catalog")
-    })
-    arrivals_awake = sum(1 for t in triggers if t["in_daily_window"])
-    arrivals_in_task = sum(1 for t in triggers if t["active_tasks"])
+    not_in_catalog = sorted({t["event"] for t in tasks if not t["in_catalog"]})
+    eligible = sum(1 for t in tasks if is_eligible(t, params))
 
-    metrics = [
+    return [
         ("calendar-bench experiment", experiment["name"]),
         ("Experiment folder", str(experiment["dir"])),
         ("Person", ", ".join(persons) or None),
         ("Persona", ", ".join(personas) or None),
-        ("Planned tasks", number_of_events),
+        ("Override parameter set", params_source),
+        ("Planned tasks", len(tasks)),
+        ("Eligible tasks (not excluded, D9)", eligible),
         ("Context annotations ([ctx:...])", len(context_events)),
-        ("Tasks with known duration", events_with_duration),
         (
             "Task events not found in event_config.yaml",
             ", ".join(not_in_catalog) or "none",
         ),
-        ("Total task duration (hours)", total_task_hours),
-        ("Total task duration (days)", total_task_hours / 24),
-        ("Average task duration (hours)", average_duration),
+        ("Total planned task duration (hours)", total_task_hours),
         (
-            "Shortest task",
-            shortest_task["label"] if shortest_task else None,
-        ),
-        (
-            "Shortest task duration (hours)",
-            shortest_task["duration_hours"] if shortest_task else None,
-        ),
-        (
-            "Longest task",
-            longest_task["label"] if longest_task else None,
-        ),
-        (
-            "Longest task duration (hours)",
-            longest_task["duration_hours"] if longest_task else None,
+            "Average task duration (hours)",
+            total_task_hours / len(durations) if durations else None,
         ),
         ("Horizon source", horizon_source),
-        ("Simulation start", simulation_start),
-        ("Simulation end", simulation_end),
+        ("Simulation start", start),
+        ("Simulation end", end),
         ("Simulation duration (hours)", simulation_hours),
         ("Simulation duration (days)", simulation_hours / 24),
-        ("Configured arrival rate (per hour)", rate_per_hour),
-        ("Number of Poisson arrivals", len(triggers)),
-        ("Arrivals inside waking window (daily_window)", arrivals_awake),
-        ("Arrivals during a planned task", arrivals_in_task),
-        ("Observed arrival rate (per hour)", observed_rate),
-        ("Average time between arrivals (hours)", average_interarrival),
-        ("Total task-hours / simulation-hours", occupancy_ratio),
+        ("Arrival rate (per hour)", rate_per_hour),
+        ("Expected arrivals per replication", rate_per_hour * simulation_hours),
+        ("Replications", replications),
+        ("Total task-hours / simulation-hours",
+         total_task_hours / simulation_hours if simulation_hours else None),
     ]
 
-    return metrics
+
+def parameter_rows(params):
+    """The effective override parameters as (parameter, value) rows."""
+    rows = []
+    beta0 = intercepts(params)
+    base = params["base_probabilities"]
+    rows.append(("p_none at baseline", 1 - sum(base[a] for a in ACTIONS)))
+    for action in ACTIONS:
+        rows.append((f"base probability {action}", base[action]))
+        rows.append((f"intercept beta0 {action}", beta0[action]))
+        for name, value in (params.get("coefficients", {}).get(action) or {}).items():
+            rows.append((f"beta {name} {action}", value))
+    for key in ("earlier_overrides_window", "earlier_overrides_cap",
+                "notification_share", "max_postpones_per_task",
+                "check_temporal_rules"):
+        rows.append((key, params.get(key)))
+    excluded = params.get("excluded") or {}
+    for key in ("events", "labels", "categories"):
+        rows.append((f"excluded {key}", ", ".join(excluded.get(key) or [])))
+    return rows
 
 
 # ============================================================
-# 6. EXPORT TO EXCEL
+# 5. EXPORT TO EXCEL
 # ============================================================
 
-def export_to_excel(tasks, context_events, triggers, metrics, persona,
-                    output_path):
-    """
-    Create an Excel workbook with Metrics, Tasks, Context, Arrivals and
-    Persona sheets.
-    """
+def _sheet(workbook, title, header, rows, first=False):
+    worksheet = workbook.active if first else workbook.create_sheet(title)
+    worksheet.title = title
+    worksheet.append(header)
+    for row in rows:
+        worksheet.append(list(row))
+    return worksheet
 
-    workbook = Workbook()
 
-    # ---- Metrics sheet ----
-    ws_metrics = workbook.active
-    ws_metrics.title = "Metrics"
-    ws_metrics.append(["Metric", "Value"])
-
-    for metric, value in metrics:
-        ws_metrics.append([metric, value])
-
-    # ---- Tasks sheet ----
-    ws_tasks = workbook.create_sheet("Tasks")
-    ws_tasks.append([
-        "UID",
-        "Summary",
-        "Start",
-        "End",
-        "Duration (hours)",
-        "Status",
-        "All-day event",
-        "Person",
-        "Persona",
-        "Label",
-        "Catalog event",
-        "Category",
-        "In event_config",
-        "Sleep marker",
-        "Concurrent",
-        "Dividable",
-        "Intensity",
-        "Time window",
-    ])
-
-    for task in tasks:
-        ws_tasks.append([
-            task["uid"],
-            task["summary"],
-            task["start"],
-            task["end"],
-            task["duration_hours"],
-            task["status"],
-            task["all_day"],
-            task["person_id"],
-            task["persona"],
-            task["label"],
-            task["event"],
-            task["category"],
-            task["in_catalog"],
-            task["is_marker"],
-            task["is_concurrent"],
-            task["is_dividable"],
-            task["intensity"],
-            task["time_window"],
-        ])
-
-    # ---- Context sheet ----
-    ws_context = workbook.create_sheet("Context")
-    ws_context.append([
-        "UID",
-        "Context category",
-        "Value",
-        "Start",
-        "End",
-        "Duration (hours)",
-    ])
-
-    for item in context_events:
-        ws_context.append([
-            item["uid"],
-            item["context_category"],
-            item["context_value"],
-            item["start"],
-            item["end"],
-            item["duration_hours"],
-        ])
-
-    # ---- Arrivals sheet ----
-    ws_arrivals = workbook.create_sheet("Arrivals")
-    ws_arrivals.append([
-        "Arrival number",
-        "Arrival time",
-        "Arrival type",
-        "Description",
-        "Time window",
-        "In waking window",
-        "Active tasks",
-    ])
-
-    for index, trigger in enumerate(triggers, start=1):
-        ws_arrivals.append([
-            index,
-            trigger["time"],
-            trigger["type"],
-            trigger["summary"],
-            trigger["time_window"],
-            trigger["in_daily_window"],
-            trigger["active_tasks"],
-        ])
-
-    # ---- Persona sheet ----
-    ws_persona = workbook.create_sheet("Persona")
-    ws_persona.append(["Characteristic", "Distribution", "Parameters"])
-    if persona:
-        for row in persona_characteristics(persona):
-            ws_persona.append(list(row))
-
-    # ---- Format all sheets ----
-    header_fill = PatternFill(
-        fill_type="solid",
-        fgColor="1F4E78",
-    )
-
+def _format(workbook):
+    header_fill = PatternFill(fill_type="solid", fgColor="1F4E78")
     for worksheet in workbook.worksheets:
         worksheet.freeze_panes = "A2"
         worksheet.auto_filter.ref = worksheet.dimensions
-
         for cell in worksheet[1]:
             cell.font = Font(bold=True, color="FFFFFF")
             cell.fill = header_fill
-            cell.alignment = Alignment(
-                horizontal="center",
-                vertical="center",
-            )
-
-        # Adjust column widths to fit content
+            cell.alignment = Alignment(horizontal="center", vertical="center")
         for column_cells in worksheet.columns:
-            max_length = 0
-            column_letter = get_column_letter(column_cells[0].column)
-
-            for cell in column_cells:
-                if cell.value is not None:
-                    max_length = max(
-                        max_length,
-                        len(str(cell.value)),
-                    )
-
-            worksheet.column_dimensions[column_letter].width = min(
-                max_length + 2, 45
+            max_length = max(
+                (len(str(c.value)) for c in column_cells if c.value is not None),
+                default=0,
             )
-
-    # Format datetime columns
-    for worksheet, columns in (
-        (ws_tasks, (3, 4)),
-        (ws_context, (4, 5)),
-        (ws_arrivals, (2,)),
-    ):
+            letter = get_column_letter(column_cells[0].column)
+            worksheet.column_dimensions[letter].width = min(max_length + 2, 45)
         for row in worksheet.iter_rows(min_row=2):
-            for column_index in columns:
-                cell = row[column_index - 1]
+            for cell in row:
                 if isinstance(cell.value, datetime):
                     cell.number_format = "yyyy-mm-dd hh:mm:ss"
 
-    # Save to the specified folder
+
+def export_to_excel(output_path, metrics, summary, per_replication, results,
+                    tasks, context_events, persona, params):
+    """
+    Workbook with the KPI summary (D13, D14), the changes (D12) and the
+    plan, context, persona and parameter details.
+    """
+    workbook = Workbook()
+
+    _sheet(workbook, "KPI summary",
+           ["KPI", "Mean", "Std. dev.", "95% CI low", "95% CI high", "N"],
+           summary, first=True)
+
+    kpi_names = list(per_replication[0])
+    _sheet(workbook, "Replications", ["Replication", "Seed"] + kpi_names, [
+        [r + 1, results[r]["seed"]] + [kpis[name] for name in kpi_names]
+        for r, kpis in enumerate(per_replication)
+    ])
+
+    change_rows = []
+    for r, result in enumerate(results):
+        for c in result["changes"]:
+            change_rows.append([
+                r + 1, c["time"], c["task_uid"], c["label"], c["event"],
+                c["drawn_action"], c["action"], c["planned_start"],
+                c["planned_end"], c["affected_hours"], c["new_start"],
+                c["new_end"], c["delay_hours"], c["fill_hours"],
+                c["earlier_overrides"], c["notified"], c["p_none"],
+                c["p_postpone"], c["p_skip"], c["p_replace"], c["note"],
+            ])
+    _sheet(workbook, "Changes", [
+        "Replication", "Override time", "Task UID", "Label", "Catalog event",
+        "Drawn action", "Applied action", "Block start", "Block end",
+        "Affected hours", "New start", "New end", "Delay (hours)",
+        "Fill (planned hours left)", "Earlier overrides", "Notified",
+        "p none", "p postpone", "p skip", "p replace", "Note",
+    ], change_rows)
+
+    first = results[0]
+    _sheet(workbook, "Decisions (run 1)", [
+        "Arrival time", "Outcome", "Task", "Fill (planned hours left)",
+        "Earlier overrides", "Notified", "p none", "p postpone", "p skip",
+        "p replace",
+    ], [[
+        d["time"], d["outcome"], d.get("task"), d.get("fill_hours"),
+        d.get("earlier_overrides"), d.get("notified"), d.get("p_none"),
+        d.get("p_postpone"), d.get("p_skip"), d.get("p_replace"),
+    ] for d in first["decisions"]])
+
+    outcomes = {o["uid"]: o for o in first["outcomes"]}
+    _sheet(workbook, "Tasks (run 1)", [
+        "UID", "Label", "Catalog event", "Category", "Start", "End",
+        "Planned hours", "Executed hours", "Eligible", "Notified",
+        "Completed", "Actions", "Final outcome", "Deviation (hours)",
+        "Concurrent", "Dividable", "Intensity", "Time window",
+    ], [[
+        t["uid"], t["label"], t["event"], t["category"], t["start"], t["end"],
+        outcomes[t["uid"]]["planned_hours"],
+        outcomes[t["uid"]]["executed_hours"],
+        outcomes[t["uid"]]["eligible"], outcomes[t["uid"]]["notified"],
+        outcomes[t["uid"]]["completed"], outcomes[t["uid"]]["actions"],
+        outcomes[t["uid"]]["final"], outcomes[t["uid"]]["deviation_hours"],
+        t["is_concurrent"], t["is_dividable"], t["intensity"],
+        t["time_window"],
+    ] for t in tasks])
+
+    executed = sorted(first["calendar"].blocks, key=lambda b: b["start"])
+    _sheet(workbook, "Executed calendar (run 1)", [
+        "Kind", "Label", "Start", "End", "Hours", "Origin task UID", "Note",
+    ], [[
+        b["kind"], b["label"], b["start"], b["end"],
+        (b["end"] - b["start"]).total_seconds() / 3600, b["origin_uid"],
+        b.get("note", ""),
+    ] for b in executed])
+
+    _sheet(workbook, "Plan metrics", ["Metric", "Value"], metrics)
+    _sheet(workbook, "Parameters", ["Parameter", "Value"], parameter_rows(params))
+
+    _sheet(workbook, "Context", [
+        "UID", "Context category", "Value", "Start", "End", "Duration (hours)",
+    ], [[
+        c["uid"], c["context_category"], c["context_value"], c["start"],
+        c["end"], c["duration_hours"],
+    ] for c in context_events])
+
+    _sheet(workbook, "Persona", ["Characteristic", "Distribution", "Parameters"],
+           persona_characteristics(persona) if persona else [])
+
+    _format(workbook)
+
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     workbook.save(output_path)
-
-    # Verify that the file exists and is not empty
     if not output_path.exists() or output_path.stat().st_size == 0:
-        raise RuntimeError(
-            f"Excel export failed. Expected file:\n{output_path}"
-        )
-
+        raise RuntimeError(f"Excel export failed. Expected file:\n{output_path}")
     return output_path
 
 
 # ============================================================
-# 7. RUN THE SIMULATION AND EXPORT
+# 6. RUN THE SIMULATION AND EXPORT
 # ============================================================
 
 def main(argv=None):
     args = parse_arguments(argv)
     ics_file = args.ics_file
-    # Save the Excel file in the SAME folder as the ICS file
-    output_file = ics_file.parent / OUTPUT_FILENAME
 
     print("Loading override config and calendar-bench experiment...")
     config = load_override_config(args.config)
     experiment = load_experiment(config["experiment_dir"])
+    rules = parse_rules(experiment["temporal_rules"])
     print(f"Config: {config['config_path']}")
     print(f"Experiment: {experiment['name']}")
+    print(f"Temporal rules used for postponing: {len(rules)}")
 
     rate_per_hour = config["arrivals"]["rate_per_hour"]
-    seed = config["arrivals"]["seed"]
+    replications = args.replications or config["replications"]["count"]
+    base_seed = config["replications"]["base_seed"]
     horizon_source = config.get("horizon_source", "experiment")
 
-    print("Loading calendar...")
-    print(f"ICS file: {ics_file}")
-
+    print(f"Loading calendar: {ics_file}")
     tasks, context_events = load_calendar(ics_file, experiment)
-    print(f"Planned tasks loaded: {len(tasks)}")
-    print(f"Context annotations loaded: {len(context_events)}")
-
+    print(f"Planned tasks: {len(tasks)}, context annotations: {len(context_events)}")
     if not tasks:
-        raise ValueError(
-            "No planned tasks were found in the ICS file."
-        )
+        raise ValueError("No planned tasks were found in the ICS file.")
 
     if horizon_source == "experiment":
-        simulation_start, simulation_end = experiment["horizon"]
-        if simulation_start is None:
+        horizon = experiment["horizon"]
+        if horizon[0] is None:
             raise ValueError(
                 "environment.yaml has no horizon.start_date / horizon.weeks; "
                 "set horizon_source: calendar in override_config.yaml."
             )
     elif horizon_source == "calendar":
-        simulation_start, simulation_end = calendar_horizon(tasks)
+        horizon = calendar_horizon(tasks)
     else:
         raise ValueError(
             f"Unknown horizon_source '{horizon_source}' "
             "(use 'experiment' or 'calendar')."
         )
 
-    print("Generating Poisson arrivals...")
-    triggers = generate_triggers(
-        tasks,
-        simulation_start,
-        simulation_end,
-        experiment,
-        rate_per_hour=rate_per_hour,
-        seed=seed,
-    )
-
-    print(f"Poisson arrivals generated: {len(triggers)}")
-
-    metrics = calculate_metrics(
-        tasks,
-        context_events,
-        triggers,
-        simulation_start,
-        simulation_end,
-        rate_per_hour,
-        experiment,
-        horizon_source,
-    )
-
+    # D15: one parameter set per persona
     persona_ids = sorted({t["persona"] for t in tasks if t.get("persona")})
-    persona = (
-        experiment["personas"][persona_ids[0]]
-        if len(persona_ids) == 1 else None
+    persona_id = persona_ids[0] if len(persona_ids) == 1 else None
+    params, params_source = parameters_for(config, persona_id)
+    print(f"Persona: {persona_id or 'unknown'} (parameters: {params_source})")
+
+    results = []
+    per_replication = []
+    for r in range(replications):
+        seed = base_seed + r
+        result = run_replication(
+            tasks, context_events, experiment, params, rules, horizon,
+            rate_per_hour, seed,
+        )
+        results.append(result)
+        per_replication.append(replication_kpis(result))
+        print(
+            f"  replication {r + 1}/{replications} (seed {seed}): "
+            f"{len(result['changes'])} overrides, completion "
+            f"{per_replication[-1]['Completion rate (eligible tasks)']:.3f}"
+        )
+
+    summary = summarise_kpis(per_replication)
+    metrics = plan_metrics(
+        tasks, context_events, horizon, experiment, horizon_source, params,
+        params_source, rate_per_hour, replications,
     )
 
-    print("Exporting results to Excel...")
+    output_dir = config["output"].get("dir") or ics_file.parent
+    stem = ics_file.stem
+    written = []
+    for r in range(min(config["output"]["executed_ics_replications"], replications)):
+        path = Path(output_dir) / f"{stem}_executed_run{r + 1}.ics"
+        written.append(write_executed_ics(results[r], context_events, path, r + 1))
 
-    saved_path = export_to_excel(
-        tasks,
-        context_events,
-        triggers,
-        metrics,
-        persona,
-        output_file,
+    persona = experiment["personas"].get(persona_id) if persona_id else None
+    excel_path = export_to_excel(
+        Path(output_dir) / f"{stem}_override_simulation.xlsx",
+        metrics, summary, per_replication, results, tasks, context_events,
+        persona, params,
     )
 
-    print("\nExcel file successfully saved!")
-    print(f"Full path: {saved_path.resolve()}")
-    print(f"File size: {saved_path.stat().st_size:,} bytes")
+    print("\nFiles written:")
+    print(f"  {excel_path.resolve()}")
+    for path in written:
+        print(f"  {path.resolve()}")
 
-    print("\nKey metrics:")
-    for metric, value in metrics:
-        print(f"{metric}: {value}")
+    print(f"\nKPIs over {replications} replications (mean [95% CI]):")
+    for name, mean, sd, low, high, n in summary:
+        if mean is None:
+            print(f"  {name}: n/a")
+        elif low is None:
+            print(f"  {name}: {mean:.4g}")
+        else:
+            print(f"  {name}: {mean:.4g} [{low:.4g}, {high:.4g}]")
 
 
 if __name__ == "__main__":
