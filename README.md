@@ -18,6 +18,7 @@ Not yet implemented: persona-dependent override logic, plan updating, and export
 
 For a full explanation of how the simulation works, see the **[manual](MANUAL.md)**.
 For the target design of the full simulation loop, see the **[conceptual model](docs/CONCEPTUAL_MODEL.md)**.
+The calendar-bench experiment configs that the override simulation builds on are in **[calendar_bench_configs](calendar_bench_configs/README.md)**.
 
 ## Installation
 
@@ -46,6 +47,7 @@ Simulation parameters (arrival rate, random seed) are set in `main()`.
 ├── src/
 │   └── simulation.py     # Simulation: load calendar, generate arrivals, metrics, Excel export
 ├── data/                 # Put input .ics files here (not tracked by git)
+├── calendar_bench_configs/  # Experiment configs copied from calendar-bench (see its README)
 ├── docs/
 │   ├── CONCEPTUAL_MODEL.md  # Target design: event-driven override loop
 │   └── images/              # Original hand-drawn sketch
