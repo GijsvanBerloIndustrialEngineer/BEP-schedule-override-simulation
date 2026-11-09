@@ -1,0 +1,20 @@
+# Settings of the override simulation.
+#
+# This is the override simulation's own config file. It sits next to the five
+# calendar-bench experiment files (environment, event_config, persona_config,
+# temporal_relation_rules, scenarios) and points at the experiment that
+# generated the .ics calendars, so the simulation uses the same horizon,
+# time windows, event catalog and personas.
+
+# calendar-bench experiment folder; relative to this file.
+experiment_dir: ../calendar_bench_configs/experiments/healthy_lifestyle_promotion
+
+# Horizon of the simulation.
+#   experiment : start_date + weeks from environment.yaml (recommended)
+#   calendar   : first to last planned task in the .ics file
+horizon_source: experiment
+
+arrivals:
+  rate_per_hour: 0.4   # lambda of the Poisson process
+  seed: 42             # seed of the arrival stream (separate from the
+                       # calendar-bench seed in environment.yaml)
