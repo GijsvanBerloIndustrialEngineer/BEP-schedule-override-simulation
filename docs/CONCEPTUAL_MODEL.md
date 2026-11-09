@@ -131,31 +131,36 @@ write executed calendar
 
 The sketch notes: **"Original model: skip task context and personas!"**
 
-The first version therefore calculates the override probability only from:
+Version 1 therefore calculates the override probability only from:
 
-- simulation parameters,
-- notifications,
-- the calendar state (total task duration, number of earlier overrides).
+- simulation parameters (a parameter set per persona, D15),
+- notifications (a random share q of tasks, D10),
+- the calendar state: planned hours left in the day (D6) and the number of earlier overrides that day (D5).
 
-Task context and personas are added as inputs in a later version.
+Task context (the `[ctx:...]` annotations) and persona characteristics are added as inputs in version 2. The context annotations are already loaded and kept apart (D11).
 
 ---
 
-## 5. Mapping to the current code
+## 5. Mapping to the code (version 1)
 
-| Model step | Current code (`src/simulation.py`) | Status |
+| Model step | Code | Status |
 |---|---|---|
-| 1. Read ICS | `load_calendar()` | Done (no recurring events, no override counter yet) |
-| 2. Relevant task or trigger | `generate_triggers()` produces Poisson arrivals, not yet linked to tasks | Partly |
-| 3. Override probability | — | To do |
-| 4. Execute action | — | To do |
-| 5. Update calendar / loop | — | To do |
+| 1. Read ICS | `load_calendar()` in `src/simulation.py`; tasks and context split | Done |
+| 2. Relevant task or trigger | `generate_arrivals()` (Poisson, D1) and the active-task rules in `run_replication()` (D2, D9), `src/override_simulation.py` | Done |
+| 3. Override probability | `action_probabilities()` in `src/override_model.py`: multinomial logit (D3–D6, D10) | Done |
+| 4. Execute action | `run_replication()`: postpone, skip, replace on the remaining part of the task (D7, D8) | Done |
+| 5. Update calendar / loop | `ExecutedCalendar` in `src/override_simulation.py`; every arrival sees the executed calendar | Done |
+| Output | KPIs and confidence intervals (D13, D14), executed `.ics` and change list (D12) | Done |
 
 ---
 
-## 6. Open design questions
+## 6. Answers to the earlier open questions
 
-- **Trigger definition:** is an event a Poisson arrival (current code), the start of each planned task, or both?
-- **Probability per action:** is there one override probability followed by a choice between postpone / skip / replace, or a separate probability for each action?
-- **Postpone and replace rules:** where does a postponed task go, and what does it get replaced with?
-- **Earlier overrides:** do they raise or lower the next override probability, and over what time window are they counted?
+| Question | Answer in version 1 |
+|---|---|
+| **Trigger definition** | Poisson arrivals (D1). An arrival acts on the active task; arrivals in free time and during sleep are ignored (D2). |
+| **Probability per action** | One multinomial logit over {no override, postpone, skip, replace} (D3), logistic with a rule-based part (D4). |
+| **Postpone and replace rules** | Postpone: next free slot on the same day that respects the temporal rules, otherwise skip (D7). Replace: a generic `UNPLANNED` block of the same length (D8). |
+| **Earlier overrides** | They **lower** the next override probability (negative coefficient), counted over the same day and capped at 3 (D5). |
+
+The full list of decisions is in [REPORT.md](REPORT.md), section 4. How the code implements them is in the [manual](../MANUAL.md).

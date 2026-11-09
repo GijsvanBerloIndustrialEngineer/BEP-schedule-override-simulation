@@ -54,7 +54,18 @@ def load_override_config(path=DEFAULT_OVERRIDE_CONFIG):
     config.setdefault("horizon_source", "experiment")
     arrivals = config.setdefault("arrivals", {})
     arrivals.setdefault("rate_per_hour", 0.4)
-    arrivals.setdefault("seed", 42)
+
+    replications = config.setdefault("replications", {})
+    replications.setdefault("count", 30)
+    replications.setdefault("base_seed", 42)
+    if replications["count"] < 1:
+        raise ValueError("replications.count must be at least 1")
+
+    output = config.get("output") or {}
+    if output.get("dir"):
+        output["dir"] = (path.parent / output["dir"]).resolve()
+    output.setdefault("executed_ics_replications", 1)
+    config["output"] = output
 
     config["config_path"] = path
     return config
@@ -66,8 +77,12 @@ def load_experiment(experiment_dir):
     environment = _read_yaml(experiment_dir / "environment.yaml")
     event_config = _read_yaml(experiment_dir / "event_config.yaml")
     persona_config = _read_yaml(experiment_dir / "persona_config.yaml")
+    rules_path = experiment_dir / "temporal_relation_rules.yaml"
+    temporal_rules = _read_yaml(rules_path) if rules_path.exists() else {}
 
     return {
+        "temporal_rules": temporal_rules,
+        "step_minutes": (environment.get("solver") or {}).get("step_minutes", 10),
         "dir": experiment_dir,
         "name": environment.get("experiment_name") or experiment_dir.name,
         "environment": environment,
