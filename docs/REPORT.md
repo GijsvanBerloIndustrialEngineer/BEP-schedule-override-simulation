@@ -226,7 +226,20 @@ All probabilities and coefficients are **assumptions** and are listed in `config
 
 More than half of the drawn postponements (on average 10.5 per run, against about 8 successful ones) find no free slot on the same day and become a skip. Of the ~551 arrivals per run, about 140 lead to an override decision; the rest fall in free time, sleep or excluded tasks. These numbers follow directly from the assumed parameters and are only a check that the model works, not a result.
 
-### 4.4 Next steps
+### 4.4 Scoring with calendar-bench
+
+calendar-bench's own per-person validation (manual, section 12) on the same calendar, replication 1:
+
+| Check | Plan | Executed (run 1) |
+|---|---|---|
+| Event constraints | 0 | 47 |
+| LTL rules | 0 | 2 |
+| Continuity | 0 | 0 |
+| Total | 0 | 49 |
+
+The event violations are mostly shortened or split episodes (`per_event_duration`) and changed day totals (`per_day`) of office work, walking, running, gym and swimming: direct effects of skipping, replacing and postponing. The two LTL violations are `walking_overlaps_physical_opportunity`: a postponed walk landed outside a *physical behavioural opportunity* context. The postponement rules (D7) only use "never at the same time" and "keep apart" rules, not "must overlap" rules; adding that shape would avoid these.
+
+### 4.5 Next steps
 
 1. Support the parameters with literature and run a sensitivity analysis (λ, base probabilities, coefficients, q).
 2. Version 2: task context (`[ctx:...]` energy state, mood, location) and persona characteristics as inputs of the probability.

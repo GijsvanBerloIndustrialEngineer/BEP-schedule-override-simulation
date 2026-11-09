@@ -36,6 +36,8 @@ compute KPIs                                                     (D13)
 | `src/override_simulation.py` | Arrivals, executed calendar, the override loop, KPIs, confidence intervals |
 | `src/rules.py` | Temporal rules that a postponed task must respect |
 | `src/executed_calendar.py` | Writes the executed calendar as `.ics` |
+| `src/calendar_bench_export.py` | Writes the plan and executed calendars in calendar-bench's JSON format |
+| `tools/validate_with_calendar_bench.py` | Scores those JSON files with calendar-bench's own validation (section 12) |
 
 ---
 
@@ -72,6 +74,7 @@ Written next to the `.ics` file, or in `output.dir` of the config:
 |---|---|
 | `<calendar>_override_simulation.xlsx` | KPI summary, replications, all changes, details of run 1, parameters (section 9) |
 | `<calendar>_executed_run1.ics` | The executed calendar of replication 1 (section 8). `output.executed_ics_replications` sets how many runs get an `.ics` |
+| `<calendar>_calendar_bench/plan/<person>.json`, `.../executed_runN/<person>.json` | The plan and the executed calendars in calendar-bench's JSON format (section 12); switch off with `output.calendar_bench_json: false` |
 
 Existing files with the same name are overwritten. On Windows, close the Excel file before running, or saving fails with a `PermissionError`.
 
@@ -87,7 +90,8 @@ Existing files with the same name are overwritten. On Windows, close the Excel f
 | `replications.count` | `30` | Number of replications R (D14) |
 | `replications.base_seed` | `42` | Replication r uses seed `base_seed + r` |
 | `output.dir` | `null` | Output folder; `null` = next to the `.ics` |
-| `output.executed_ics_replications` | `1` | Number of runs that get an executed `.ics` |
+| `output.executed_ics_replications` | `1` | Number of runs that get an executed `.ics` (and calendar-bench JSON) |
+| `output.calendar_bench_json` | `true` | Also write calendar-bench JSON files (section 12) |
 | `override_model.default` | see below | The parameter set used for every persona |
 | `override_model.personas.<persona id>` | see below | Values that differ for one persona (D15) |
 
@@ -330,3 +334,65 @@ The executed `.ics` can be read again by `load_calendar`.
 | `PermissionError` when saving | The Excel file is still open. Close it and run again |
 | Persona shows `unknown` | The person id does not match a persona in `persona_config.yaml`; the `default` parameter set is used |
 | Metric *Task events not found in event_config.yaml* is not `none` | The calendar comes from a different experiment than `experiment_dir` |
+| `ModuleNotFoundError: No module named 'pydantic'` / `'z3'` (validation script) | Run the script with the separate environment from section 12 |
+| Validation: *person ... is not in the sampled population* | The calendar comes from a different experiment than `experiment_dir`, or the persona config was changed |
+
+---
+
+## 12. Scoring with calendar-bench (`tools/validate_with_calendar_bench.py`)
+
+calendar-bench has its own validation of a person's calendar. This script runs it on the **plan** and on the **executed calendar(s)** and compares the two. The difference shows how much the overrides damage the qualities the planner guaranteed.
+
+calendar-bench is **not changed**: the script imports its check functions from a local checkout and only reads it.
+
+### What is checked
+
+| Check | What it counts |
+|---|---|
+| `event` | Event constraints from `event_config.yaml`: duration of one episode (`per_event_duration`), total per day and number of episodes per day (`per_day`), allowed weekdays (`weekday`) |
+| `ltl` | LTL rules from `temporal_relation_rules.yaml`, **including the context rules** (e.g. `no_office_when_tired`, `walking_overlaps_physical_opportunity`) |
+| `continuity` | Sleep and other events that cross midnight line up with the next day |
+| `persona` | Stage cadence of the persona |
+
+Not checked: the population-level checks (instance counts, distributions of characteristics and contexts), because they need all 30 persons, and the Allen pair rules, which calendar-bench only uses in its scenario evaluation.
+
+Many violations in the executed calendar are **intended** by the overrides: a skipped or cut-off workout is shorter than its minimum duration. Report the difference between plan and execution, not the absolute count.
+
+### Why not calendar-bench's `persona validate` command
+
+- Its JSON loader drops the context episodes, so context rules would never fire.
+- It pairs files with sampled persons by list position, which only works for a full population.
+- Its `load_config()` connects to Neo4j for experiments with contexts.
+
+The script calls the same check functions directly, loads the contexts, and matches the person by id.
+
+### Setup (once)
+
+```bash
+git clone https://github.com/MaaniBeigy/calendar-bench path/to/calendar-bench
+python -m venv .venv-calendar-bench
+.venv-calendar-bench/Scripts/python -m pip install -r tools/requirements-calendar-bench.txt
+```
+
+(On macOS/Linux: `.venv-calendar-bench/bin/python`.)
+
+### Run
+
+```bash
+python src/simulation.py path/to/calendar.ics
+.venv-calendar-bench/Scripts/python tools/validate_with_calendar_bench.py --calendar-bench path/to/calendar-bench path/to/<calendar>_calendar_bench
+```
+
+Set `output.executed_ics_replications` higher to score more replications; every `executed_runN` folder becomes a column.
+
+### Output
+
+In the `<calendar>_calendar_bench` folder:
+
+- `validation_report.md`: violations per check, per event/kind and per rule, for the plan, every run, and the difference with the plan;
+- `validation_report.json`: the same numbers plus every single violation.
+
+### Check of the conversion
+
+The exported **plan** of `diligent_anxious_active_0000` gives 0 violations, as a calendar generated by calendar-bench should. A test calendar with an office-work block placed on a `tired` context episode gives `no_office_when_tired` violations, so the context rules are active.
+
