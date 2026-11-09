@@ -36,6 +36,8 @@ replications:
 output:
   dir: null
   executed_ics_replications: 1   # write an executed .ics for the first N runs
+  calendar_bench_json: true       # also write plan + executed runs as calendar-bench
+                                  # JSON, for tools/validate_with_calendar_bench.py
 
 # D3, D4, D5, D6, D9, D10, D15: the override model.
 override_model:

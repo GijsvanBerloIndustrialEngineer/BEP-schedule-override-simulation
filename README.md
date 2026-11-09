@@ -48,6 +48,15 @@ Output, next to the `.ics` file (or in `output.dir` of the config):
 
 - `<calendar>_override_simulation.xlsx`: KPI summary, replications, changes, decisions, tasks, executed calendar, parameters.
 - `<calendar>_executed_run1.ics`: the executed calendar of replication 1, to compare with the plan.
+- `<calendar>_calendar_bench/`: the plan and the executed calendar in calendar-bench's JSON format.
+
+### Scoring with calendar-bench
+
+`tools/validate_with_calendar_bench.py` runs calendar-bench's own per-person validation (event constraints, LTL rules with contexts, continuity) on the plan and on the executed calendar and compares them. It reads a local calendar-bench checkout and does not change it. See the [manual](MANUAL.md), section 12.
+
+```bash
+python tools/validate_with_calendar_bench.py --calendar-bench path/to/calendar-bench path/to/<calendar>_calendar_bench
+```
 
 ## Repository structure
 
@@ -59,7 +68,11 @@ Output, next to the `.ics` file (or in `output.dir` of the config):
 │   ├── override_model.py       # Multinomial logit, eligibility, parameter sets per persona
 │   ├── rules.py                # Temporal rules used when postponing
 │   ├── executed_calendar.py    # Writes the executed .ics
-│   └── calendar_bench_link.py  # Reads the calendar-bench configs and matches events to them
+│   ├── calendar_bench_link.py  # Reads the calendar-bench configs and matches events to them
+│   └── calendar_bench_export.py # Writes calendars in calendar-bench's JSON format
+├── tools/
+│   ├── validate_with_calendar_bench.py   # Scores plan vs executed with calendar-bench's checks
+│   └── requirements-calendar-bench.txt   # Packages for that script
 ├── config/
 │   └── override_config.yaml    # Settings of the override simulation
 ├── calendar_bench_configs/     # Experiment configs copied from calendar-bench

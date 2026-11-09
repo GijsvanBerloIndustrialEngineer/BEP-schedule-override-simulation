@@ -23,6 +23,7 @@ from override_simulation import (
     summarise_kpis,
 )
 from executed_calendar import write_executed_ics
+from calendar_bench_export import write_calendar_bench_json
 from rules import parse_rules
 
 
@@ -456,6 +457,23 @@ def main(argv=None):
     for r in range(min(config["output"]["executed_ics_replications"], replications)):
         path = Path(output_dir) / f"{stem}_executed_run{r + 1}.ics"
         written.append(write_executed_ics(results[r], context_events, path, r + 1))
+
+    # calendar-bench per-person JSON of the plan and the executed calendars,
+    # for tools/validate_with_calendar_bench.py
+    if config["output"].get("calendar_bench_json", True):
+        person_ids = sorted({t["person_id"] for t in tasks if t.get("person_id")})
+        person_id = person_ids[0] if len(person_ids) == 1 else stem
+        json_dir = Path(output_dir) / f"{stem}_calendar_bench"
+        written.append(write_calendar_bench_json(
+            tasks, context_events, horizon, person_id, persona_id or "",
+            json_dir / "plan" / f"{person_id}.json",
+        ))
+        for r in range(min(config["output"]["executed_ics_replications"], replications)):
+            written.append(write_calendar_bench_json(
+                results[r]["calendar"].blocks, context_events, horizon,
+                person_id, persona_id or "",
+                json_dir / f"executed_run{r + 1}" / f"{person_id}.json",
+            ))
 
     persona = experiment["personas"].get(persona_id) if persona_id else None
     excel_path = export_to_excel(

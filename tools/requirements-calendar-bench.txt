@@ -1,0 +1,8 @@
+# Packages needed to run tools/validate_with_calendar_bench.py.
+# Install them in a separate environment next to a local calendar-bench checkout.
+pyyaml>=6.0
+pydantic>=2.0
+z3-solver>=4.13.0
+icalendar>=5.0.0
+numpy>=1.26.0
+scipy>=1.11.0
