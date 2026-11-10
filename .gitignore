@@ -17,3 +17,7 @@ data/*
 *.ics
 *.xlsx
 ~$*.xlsx
+
+# Experiment results are kept in git
+!results/**/*.ics
+!results/**/*.xlsx
