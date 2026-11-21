@@ -1,0 +1,251 @@
+# Settings of the override simulation, version 2.
+#
+# Every number below is documented in ../PARAMETERS.md with where it comes
+# from. Tags used in the comments:
+#   [ASSUMPTION]  chosen by me, not fitted; the sensitivity analysis covers it
+#   [LIT-DIR]     the DIRECTION (sign) is supported by literature (see
+#                 PARAMETERS.md); the size is still an assumption
+#   [CB]          taken from the calendar-bench experiment configs
+#
+# Version 1's config (../../config/override_config.yaml) is not read.
+
+# calendar-bench experiment folder; relative to this file. [CB]
+experiment_dir: ../../calendar_bench_configs/experiments/healthy_lifestyle_promotion
+
+# Planned calendar used when no .ics is given on the command line; relative
+# to this file. data/ is not tracked by git (see the root .gitignore).
+default_calendar: ../../data/diligent_anxious_active_0000.ics
+
+horizon_source: experiment   # experiment | calendar
+
+# ------------------------------------------------------------------
+# Triggers: when does the person reconsider a planned task?
+# ------------------------------------------------------------------
+triggers:
+  # D1 (as v1): Poisson arrivals during the task. [ASSUMPTION]
+  rate_per_hour: 0.4
+  # NEW in v2: one decision at the planned start of every eligible task.
+  # Without it, a 10-minute task is hit by a Poisson arrival only ~6% of the
+  # time, so short health tasks would almost always count as "completed".
+  # Set to false to reproduce v1's trigger logic.
+  task_start: true
+
+replications:
+  count: 30
+  base_seed: 42
+
+output:
+  dir: ../output              # relative to this file
+  executed_ics_replications: 1
+  calendar_bench_json: true
+
+# ------------------------------------------------------------------
+# Persona traits (NEW in v2)
+# ------------------------------------------------------------------
+# calendar-bench samples the Big Five per person but does not write the
+# sampled values into the .ics. Options:
+#   mean   : use the persona's loc from persona_config.yaml       [CB]
+#   sample : draw from the persona's norm(loc, scale), clipped,
+#            once per replication (between-person variation)       [CB]
+persona:
+  trait_source: mean
+  # Traits enter the logit centred: (trait - centre).
+  centre: 0.5
+
+# ------------------------------------------------------------------
+# Override model: multinomial logit, "no override" is the reference
+# ------------------------------------------------------------------
+override_model:
+  default:
+    # Probabilities at the reference point (fill = 0, no earlier
+    # overrides, not notified, no context active, traits = centre).
+    # [ASSUMPTION]; total override 0.25 per decision. Order of magnitude
+    # in line with the intention-behaviour gap literature [LIT-DIR].
+    base_probabilities:
+      postpone: 0.12
+      skip: 0.08
+      replace: 0.05
+
+    # State covariates (as v1). [ASSUMPTION]
+    coefficients:
+      postpone: { fill: 0.10, earlier_overrides: -0.40, notified: -0.30 }
+      skip:     { fill: 0.08, earlier_overrides: -0.40, notified: -0.50 }
+      replace:  { fill: 0.05, earlier_overrides: -0.40, notified: -0.20 }
+    earlier_overrides_window: day
+    earlier_overrides_cap: 3
+    notification_share: 0.5         # q [ASSUMPTION]
+
+    # NEW: context covariates. Each covariate is 1 when one of its context
+    # values is active at the decision moment (from the [ctx:...] events),
+    # else 0. `intensity_slope` adds beta * (task intensity - 1) when the
+    # covariate is active (tired + intensive task is worse). [LIT-DIR]
+    context_covariates:
+      tired:              { category: energy_state, values: [tired] }
+      energetic:          { category: energy_state, values: [energetic] }
+      negative_mood:      { category: mood_emotion, values: [anxious] }
+      positive_mood:      { category: mood_emotion, values: [happy, calm] }
+      stress:             { category: stress, values: [stress_episode] }
+      low_self_efficacy:  { category: capability_opportunity, values: [low_self_efficacy] }
+      intention_not_to_act: { category: behaviour_state, values: [intention_not_to_enact_a_behaviour] }
+      intention_to_act:   { category: behaviour_state, values: [intention_to_enact_a_behaviour, action_planning] }
+      bad_weather_outdoor: { category: weather_environment, values: [raining_or_snowing], only_outdoor_tasks: true }
+      # Location: 1 when the person's current location is known and does
+      # not fit the task (see location_fit below).
+      location_mismatch:  { special: location_mismatch }
+
+    context_coefficients:
+      postpone:
+        tired: 0.40
+        energetic: -0.20
+        negative_mood: 0.30
+        positive_mood: -0.15
+        stress: 0.30
+        low_self_efficacy: 0.25
+        intention_not_to_act: 0.40
+        intention_to_act: -0.30
+        bad_weather_outdoor: 0.60
+        location_mismatch: 0.70
+      skip:
+        tired: 0.50
+        energetic: -0.20
+        negative_mood: 0.30
+        positive_mood: -0.15
+        stress: 0.40
+        low_self_efficacy: 0.40
+        intention_not_to_act: 0.50
+        intention_to_act: -0.40
+        bad_weather_outdoor: 0.40
+        location_mismatch: 0.50
+      replace:
+        tired: 0.40
+        energetic: -0.10
+        negative_mood: 0.20
+        positive_mood: 0.00
+        stress: 0.30
+        low_self_efficacy: 0.20
+        intention_not_to_act: 0.30
+        intention_to_act: -0.20
+        bad_weather_outdoor: 0.30
+        location_mismatch: 0.30
+    # Extra effect of `tired` per intensity level above 1. [LIT-DIR]
+    intensity_slope: { tired: 0.15 }
+
+    # NEW: persona-trait coefficients on (trait - centre). [LIT-DIR]
+    # Conscientiousness lowers, neuroticism raises procrastination-like
+    # behaviour (postpone/skip); extraversion raises social replacement.
+    trait_coefficients:
+      postpone: { conscientiousness: -2.0, neuroticism: 0.8, openness: 0.0, extraversion: 0.0, agreeableness: 0.0 }
+      skip:     { conscientiousness: -2.0, neuroticism: 0.6, openness: 0.0, extraversion: 0.0, agreeableness: 0.0 }
+      replace:  { conscientiousness: -1.0, neuroticism: 0.3, openness: 0.5, extraversion: 0.5, agreeableness: 0.0 }
+
+    # Location fit per catalog event: allowed location contexts. Events not
+    # listed (and health tasks without ontology links) never mismatch.
+    location_fit:
+      office_work: [workplace, home]
+      cleaning: [home]
+      laundry: [home]
+      cooking: [home]
+      journaling: [home]
+      reading: [home]
+      shower: [home]
+      studying: [home]
+      study_reading: [home]
+    # Catalog events / health sub-classes that are done outdoors.
+    outdoor_events: [walking, running, cycling, swimming]
+    outdoor_health_subclasses: [DailyStepsAndWalking, CardioAndStamina]
+
+    # Postponing / replanning (D7, CHANGED): the search for a new slot
+    # spans a WEEK instead of only the same day (v1).
+    #   rolling       : from the interruption up to `days` days later
+    #   calendar_week : until the end of the same Mon-Sun week (the
+    #                   calendar-bench scenarios plan per week)
+    #   same_day      : v1 behaviour
+    postpone_window:
+      mode: rolling                  # rolling | calendar_week | same_day
+      days: 7                        # [ASSUMPTION] used by `rolling`
+    max_postpones_per_task: 1
+    postpone_respect_weekdays: false # true: only days allowed in event_config.yaml
+    check_temporal_rules: true
+
+    excluded:
+      events: [sleep, napping, wake_up, go_to_bed, breakfast, lunch, dinner, snacking, drink_water, meeting]
+      labels: [standup, external meeting]
+      categories: []
+
+    # Replacement (D8, CHANGED): what the person does instead. Weight =
+    # base_weight * product of multipliers of the active contexts and
+    # traits. `event` is the calendar-bench catalog event the block gets
+    # (exported to calendar-bench JSON); null = not a catalog event.
+    # max_minutes caps the replacement; the rest of the slot stays free.
+    # [ASSUMPTION]
+    replacements:
+      rest:
+        event: napping
+        base_weight: 1.0
+        max_minutes: 45
+        context_multipliers: { tired: 4.0, energetic: 0.3, stress: 1.5 }
+      snack:
+        event: snacking
+        base_weight: 0.8
+        max_minutes: 20
+        context_multipliers: { hungry: 4.0, stress: 1.5, negative_mood: 1.5 }
+      socialise:
+        event: socialising
+        base_weight: 0.8
+        max_minutes: 120
+        context_multipliers: { with_family: 2.0, social_opportunity: 2.5, positive_mood: 1.5 }
+        trait_multipliers: { extraversion: 3.0 }
+      read:
+        event: reading
+        base_weight: 0.6
+        max_minutes: 60
+        context_multipliers: { calm: 2.0, home: 1.5 }
+      screen_time:
+        event: null
+        base_weight: 1.0
+        max_minutes: 90
+        context_multipliers: { negative_mood: 2.0, stress: 2.0, low_self_efficacy: 1.5, alone: 1.5 }
+        trait_multipliers: { neuroticism: 2.0 }
+      walk_outside:
+        event: walking
+        base_weight: 0.3
+        max_minutes: 40
+        context_multipliers: { suitable_for_outdoor: 3.0, energetic: 2.0, raining_or_snowing: 0.1 }
+        trait_multipliers: { openness: 2.0 }
+    # Context values used by the multipliers above (name: [category, value]).
+    replacement_contexts:
+      tired: [energy_state, tired]
+      energetic: [energy_state, energetic]
+      hungry: [physiological, hungry]
+      stress: [stress, stress_episode]
+      negative_mood: [mood_emotion, anxious]
+      positive_mood: [mood_emotion, happy]
+      calm: [mood_emotion, calm]
+      with_family: [social_context, with_family]
+      alone: [social_context, alone]
+      social_opportunity: [capability_opportunity, social_behavioural_opportunity]
+      low_self_efficacy: [capability_opportunity, low_self_efficacy]
+      home: [location, home]
+      suitable_for_outdoor: [weather_environment, suitable_for_outdoor]
+      raining_or_snowing: [weather_environment, raining_or_snowing]
+
+  # Persona-specific overrides (only what differs from default). Since v2
+  # has the traits as inputs, the persona base probabilities of v1 are
+  # NOT repeated here: persona differences come from the traits.
+  personas: {}
+
+# ------------------------------------------------------------------
+# Health scenario (calendar-bench healthy_lifestyle_promotion)
+# ------------------------------------------------------------------
+health_scenario:
+  # Folders with calendar-bench solution files (<person_id>.json, with a
+  # "scheduled" list), one per planning method. Relative to this file.
+  solutions:
+    human_coach: ../data/scenario_solutions/human_coach
+  # Planning methods built into v2 that place the SAME task batch
+  # (taken from the first solution above) into the base calendar.
+  builtin_methods: [fcfs_greedy_v2, random_slot_v2, context_aware_v2]
+  health_task_catalog: ../data/health_task_catalog.json
+  # Health tasks can always get an override, also concurrent ones.
+  notify_health_tasks: null   # null = use notification_share
+  seed: 20260701
