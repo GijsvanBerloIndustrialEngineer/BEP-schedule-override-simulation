@@ -1,0 +1,80 @@
+# Settings of the override simulation, version 3.
+#
+# Version 3 separates two decisions that version 2 combined into one:
+#   Stage 1  REVIEW     : before the day starts, the person looks at the
+#                         day's plan and keeps, moves or drops each task.
+#                         They know the load of the day and the task, but
+#                         not yet their energy or mood at the planned time.
+#   Stage 2  EXECUTION  : at the planned start, the version 2 decision
+#                         (none / postpone / skip / replace) with the
+#                         momentary context; then, once a task has started,
+#                         a separate PROGRESS draw decides whether it is
+#                         finished or stopped part-way (partial).
+#
+# Everything else (context covariates, persona traits, replacement
+# activities, replanning window, exclusions, health scenario) is taken
+# from the version 2 config below and is NOT repeated here.
+#
+# Tags as in v2/PARAMETERS.md: [ASSUMPTION], [LIT-DIR], [CB].
+
+base_config: ../../v2/config/v2_config.yaml
+
+output:
+  dir: ../output              # relative to this file
+
+# Triggers of the execution stage.
+triggers:
+  task_start: true            # decision at the planned start (as v2)
+  # Poisson interruptions during a task (v1/v2). Off in v3: the progress
+  # model of stage 2 now produces partial execution. Set to a rate > 0 to
+  # add them back (they then act like in v2).
+  rate_per_hour: 0.0
+
+stages:
+  review:
+    enabled: true
+    # same_morning : review at `time` on the day itself
+    # evening_before: review at `time` on the previous evening
+    mode: same_morning
+    time: "07:00"                       # [ASSUMPTION]
+    max_moves_per_task: 1
+    # Probabilities of move / drop at the reference point (a typical day
+    # with day_load_centre planned hours, intensity 1, average traits);
+    # keep = 1 - move - drop. [ASSUMPTION]
+    base_probabilities: { move: 0.06, drop: 0.04 }
+    day_load_centre: 8          # hours; [ASSUMPTION]
+    # Log-odds effects. day_load = planned hours of time-blocking tasks
+    # left that day at the review moment, minus day_load_centre;
+    # intensity = task intensity - 1.
+    # A full day and an intensive task make moving and dropping more
+    # likely (planning fallacy: Buehler et al., 1994). [LIT-DIR]
+    coefficients:
+      move: { day_load: 0.08, intensity: 0.15 }
+      drop: { day_load: 0.10, intensity: 0.20 }
+    # Traits centred at persona.centre (0.5). [LIT-DIR: Steel, 2007]
+    trait_coefficients:
+      move: { conscientiousness: -1.0, neuroticism: 0.5 }
+      drop: { conscientiousness: -2.0, neuroticism: 0.5 }
+    # A moved task goes to the first feasible slot from the next day on,
+    # within this many days (temporal rules as in v2). [ASSUMPTION]
+    move_window_days: 7
+
+  progress:
+    enabled: true
+    # Probability that a started task is finished, at the reference point
+    # (no context, intensity 1, average traits). [ASSUMPTION]
+    base_completion: 0.92
+    # Log-odds effects of the context at the start (names of the v2
+    # context covariates) and of intensity. [LIT-DIR: Liao et al., 2015]
+    coefficients:
+      tired: -0.60
+      stress: -0.40
+      negative_mood: -0.30
+      energetic: 0.30
+      intensity: -0.30        # per intensity level above 1
+    trait_coefficients:       # [LIT-DIR: Claessens et al., 2010; Steel, 2007]
+      conscientiousness: 1.5
+      neuroticism: -0.3
+    # A task that is not finished stops after a uniform share of its
+    # duration in this range; the rest of the slot stays free. [ASSUMPTION]
+    stop_fraction: [0.25, 0.85]
