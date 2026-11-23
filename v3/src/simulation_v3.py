@@ -172,6 +172,7 @@ def run_replication(tasks, context_events, experiment, params, rules, horizon,
         cut = max(moment, block["start"])
         remaining = block["end"] - cut
         uid = block["origin_uid"]
+        planned = (block["start"], block["end"])   # before shorten() changes the block
         if action == "postpone":
             slot = find_slot_across_days(calendar, block, block["end"], remaining,
                                          experiment, rules, params, end)
@@ -187,7 +188,7 @@ def run_replication(tasks, context_events, experiment, params, rules, horizon,
                 push(slot, "start", moved)
                 events[uid].append("postponed")
                 c = _change(moment, block, "postpone", "execution", slot, slot + remaining,
-                            _hours(slot - cut))
+                            _hours(slot - cut), planned=planned)
                 changes.append(c); exec_changes.append(c)
                 return
         if action == "skip":
@@ -209,7 +210,7 @@ def run_replication(tasks, context_events, experiment, params, rules, horizon,
             })
             events[uid].append("replaced")
             rec["replacement"] = name
-        c = _change(moment, block, action, "execution")
+        c = _change(moment, block, action, "execution", planned=planned)
         changes.append(c); exec_changes.append(c)
 
     def do_start(block, moment):
@@ -230,11 +231,12 @@ def run_replication(tasks, context_events, experiment, params, rules, horizon,
         share = rng["progress"].uniform(lo, hi)
         dur = block["end"] - block["start"]
         stop = block["start"] + timedelta(minutes=max(1, round(_hours(dur) * 60 * share)))
+        planned = (block["start"], block["end"])
         calendar.shorten(block, stop)
         block["note"] = f"stopped after {100 * share:.0f}% (partial)"
         events[block["origin_uid"]].append("partial")
         rec["outcome"] = "started, partial"
-        changes.append(_change(stop, block, "partial", "progress"))
+        changes.append(_change(stop, block, "partial", "progress", planned=planned))
 
     def do_arrival(moment):
         active = [b for b in calendar.active_at(moment)
@@ -268,11 +270,13 @@ def run_replication(tasks, context_events, experiment, params, rules, horizon,
             "changes": changes, "outcomes": outcomes, "traits": traits}
 
 
-def _change(t, block, action, stage, new_start=None, new_end=None, delay=None):
+def _change(t, block, action, stage, new_start=None, new_end=None, delay=None, planned=None):
+    """One change; `planned` = (start, end) of the block before it was cut."""
+    p_start, p_end = planned or (block["start"], block["end"])
     return {"time": t, "task_uid": block["origin_uid"], "label": block["label"],
             "event": block.get("event"), "category": block.get("category"),
-            "action": action, "stage": stage, "planned_start": block["start"],
-            "planned_end": block["end"], "new_start": new_start, "new_end": new_end,
+            "action": action, "stage": stage, "planned_start": p_start,
+            "planned_end": p_end, "new_start": new_start, "new_end": new_end,
             "delay_hours": delay, "days_moved": ((new_start.date() - t.date()).days
                                                  if new_start else None), "note": ""}
 
