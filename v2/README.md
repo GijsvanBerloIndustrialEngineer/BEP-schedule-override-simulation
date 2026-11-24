@@ -64,7 +64,7 @@ Caveats when you report this:
 
 - `context_aware_v2` plans with the same model it's evaluated with, so its advantage is an upper bound: "what if the planner knew the person's context". Its result depends on the assumed context coefficients.
 - The human coach splits dividable tasks into pieces (208 pieces for 164 tasks). Each piece faces its own decisions, which lowers "all pieces done".
-- Only `diligent_anxious_active_0000` has a local `.ics`. To run other persons, generate their calendar with calendar-bench and import their human coach file (`tools/import_calendar_bench.py --persons ...`).
+- The calendars of all 30 persons are in `../calendar_bench_population/ics/` and their human coach files in `data/scenario_solutions/human_coach/`, so the comparison runs for any person: pass their `.ics` as the first argument.
 
 To add a real calendar-bench method's output later: put its `<person_id>.json` solution files in a folder and run `compare_planning_methods.py --solutions ptime=path/to/folder`, or add the folder under `health_scenario.solutions` in the config.
 

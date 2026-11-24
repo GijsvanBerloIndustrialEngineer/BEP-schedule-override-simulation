@@ -580,7 +580,11 @@ python v3/src/run_simulation.py calendar_bench_population/ics/free_spirited_soci
 - The persona is read from the person id, so the persona parameter set (version 1) or the persona traits (versions 2 and 3) follow automatically.
 - Version 1 writes its output next to the `.ics`, inside `calendar_bench_population/ics/`. Those files are ignored by git. Keep the repository in a short path on Windows: the output path of version 1 must stay under 260 characters.
 - Versions 2 and 3 use the persona **mean** traits (`persona.trait_source: mean`), not the sampled values in `persons/<person_id>.json`.
-- The health-scenario comparison (sections 13.5, 14.1) needs the human coach file of the person in `v2/data/scenario_solutions/human_coach/`. Only `diligent_anxious_active_0000` is there; import others with `v2/tools/import_calendar_bench.py --persons <person_id> ...`.
+- The health-scenario comparison (sections 13.5, 14.1) needs the human coach file of the person in `v2/data/scenario_solutions/human_coach/`. The files of all 30 persons are there (imported from calendar-bench commit `2c823c2` with `v2/tools/import_calendar_bench.py`), so the comparison runs for every population calendar.
+
+### Scenario output of the other planning methods
+
+The scenario definitions (`scenarios.yaml`: the weekly ramp of the Progressive Healthy Lifestyle Challenge, the LLM augmenters, greedy, PTIME and DQN) are in `calendar_bench_configs/experiments/healthy_lifestyle_promotion/` and are identical to the calendar-bench repository. calendar-bench publishes only the output of the **human coach**; the output of the other methods needs a calendar-bench run of its own (LLM API keys, Neo4j). When those solution files are available, add them as described in section 13.5.
 
 To run the whole population, loop over the folder, for example in PowerShell:
 
