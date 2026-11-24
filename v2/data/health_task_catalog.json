@@ -51,6 +51,57 @@
     "low_emotional_management_exertion_expended_on_a_behaviour"
    ]
   },
+  "add-fruit-to-salad-bowl": {
+   "domain": "Nutrition",
+   "subclass": "VegetablesAndColorfulPlates",
+   "level": "Level2",
+   "title": "Add Fruit to Salad Bowl 🍎",
+   "estimated_duration": 10,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "indoor_kitchen",
+    "nursing_home",
+    "group_home_facility",
+    "long_term_care_facility",
+    "university_building"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
+    "feeling_weak"
+   ]
+  },
+  "add-nuts-to-a-meal": {
+   "domain": "Nutrition",
+   "subclass": "MealUpgrade",
+   "level": "Level2",
+   "title": "Add Nuts to a Meal 🥜",
+   "estimated_duration": 15,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "indoor_kitchen",
+    "living_room",
+    "office",
+    "workplace",
+    "workplace_2",
+    "cafeteria",
+    "school_building",
+    "university_building",
+    "indoorbuildingspace"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
+    "feeling_weak",
+    "low_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
   "add-one-personal-touch": {
    "domain": "MentalWellbeing",
    "subclass": "StressAndSupportSkills",
@@ -314,6 +365,31 @@
     "moderate_emotional_management_exertion_expended_on_a_behaviour"
    ]
   },
+  "clean-actively-for-30-minutes": {
+   "domain": "PhysicalActivity",
+   "subclass": "ActiveRoutinesAndChores",
+   "level": "Level3",
+   "title": "Clean Actively for 30 Minutes 🧹",
+   "estimated_duration": 30,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "indoor_kitchen",
+    "living_room",
+    "room",
+    "nursing_home",
+    "group_home_facility",
+    "long_term_care_facility"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
+    "moderate_emotional_management_exertion_expended_on_a_behaviour",
+    "high_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
   "do-10-minutes-of-cardio": {
    "domain": "PhysicalActivity",
    "subclass": "CardioAndStamina",
@@ -479,6 +555,55 @@
     "high_emotional_management_exertion_expended_on_a_behaviour"
    ]
   },
+  "do-a-bodyweight-circuit": {
+   "domain": "PhysicalActivity",
+   "subclass": "StrengthAndBodyweightMoves",
+   "level": "Level3",
+   "title": "Do a Bodyweight Circuit 💪",
+   "estimated_duration": 30,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "living_room",
+    "room",
+    "sports_facility",
+    "nursing_home",
+    "group_home_facility",
+    "long_term_care_facility",
+    "day_care_facility",
+    "university_building",
+    "school_building",
+    "indoorbuildingspace"
+   ],
+   "energy_links": [
+    "feeling_energetic",
+    "moderate_emotional_management_exertion_expended_on_a_behaviour",
+    "high_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
+  "do-a-short-wind-down": {
+   "domain": "MentalWellbeing",
+   "subclass": "SleepAndEveningRoutine",
+   "level": "Level1",
+   "title": "Do a Short Wind-Down 😴",
+   "estimated_duration": 10,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "living_room",
+    "room"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_exhausted",
+    "feeling_weak",
+    "low_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
   "drink-a-glass-of-water": {
    "domain": "Nutrition",
    "subclass": "HydrationBoost",
@@ -598,6 +723,33 @@
     "low_emotional_management_exertion_expended_on_a_behaviour"
    ]
   },
+  "eat-wholegrain-snack": {
+   "domain": "Nutrition",
+   "subclass": "WholegrainChoices",
+   "level": "Level1",
+   "title": "Eat Wholegrain Snack 🍘",
+   "estimated_duration": 15,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "indoor_kitchen",
+    "office",
+    "workplace",
+    "workplace_2",
+    "cafeteria",
+    "school_building",
+    "university_building",
+    "indoorbuildingspace"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
+    "feeling_weak",
+    "low_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
   "get-morning-light": {
    "domain": "MentalWellbeing",
    "subclass": "EverydayWellbeingPractices",
@@ -620,6 +772,37 @@
     "feeling_tired",
     "feeling_energetic",
     "feeling_exhausted",
+    "feeling_weak",
+    "low_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
+  "infuse-a-water-bottle": {
+   "domain": "Nutrition",
+   "subclass": "HydrationBoost",
+   "level": "Level2",
+   "title": "Infuse a Water Bottle 🥒",
+   "estimated_duration": 15,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "indoor_kitchen",
+    "living_room",
+    "room",
+    "office",
+    "office_building",
+    "workplace",
+    "workplace_2",
+    "nursing_home",
+    "group_home_facility",
+    "long_term_care_facility",
+    "university_building",
+    "school_building"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
     "feeling_weak",
     "low_emotional_management_exertion_expended_on_a_behaviour"
    ]
@@ -896,6 +1079,27 @@
     "moderate_emotional_management_exertion_expended_on_a_behaviour"
    ]
   },
+  "make-the-bedroom-screen-free": {
+   "domain": "MentalWellbeing",
+   "subclass": "FocusAndPhoneBoundaries",
+   "level": "Level2",
+   "title": "Make the Bedroom Screen-Free 📵",
+   "estimated_duration": 5,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "living_room",
+    "room"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
+    "feeling_exhausted",
+    "feeling_weak"
+   ]
+  },
   "message-one-new-contact": {
    "domain": "MentalWellbeing",
    "subclass": "SocialConnection",
@@ -947,6 +1151,77 @@
     "rapid_transit_system",
     "car",
     "bus"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
+    "feeling_exhausted",
+    "feeling_weak",
+    "low_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
+  "mindful-pause": {
+   "domain": "MentalWellbeing",
+   "subclass": "CalmBreathingAndMindfulness",
+   "level": "Level1",
+   "title": "Mindful Pause 🧘",
+   "estimated_duration": 5,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "living_room",
+    "room",
+    "office",
+    "office_building",
+    "workplace",
+    "workplace_2",
+    "conference_room",
+    "school_building",
+    "university_building",
+    "healthcare_facility",
+    "public_park",
+    "outdoor_environment",
+    "garden",
+    "domestic_garden",
+    "indoorbuildingspace",
+    "transport_hub"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
+    "feeling_exhausted",
+    "feeling_weak",
+    "low_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
+  "move-for-10-minutes": {
+   "domain": "PhysicalActivity",
+   "subclass": "CardioAndStamina",
+   "level": "Level2",
+   "title": "Move for 10 Minutes 💪",
+   "estimated_duration": 10,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "living_room",
+    "room",
+    "sports_facility",
+    "winter_sports_facility",
+    "public_sports_field",
+    "public_park",
+    "garden",
+    "domestic_garden",
+    "botanical_garden",
+    "outdoor_environment",
+    "sidewalk",
+    "university_campus",
+    "outdoorbuildingspace",
+    "in_a_park",
+    "playground"
    ],
    "energy_links": [
     "feeling_tired",
@@ -1083,6 +1358,74 @@
     "low_emotional_management_exertion_expended_on_a_behaviour"
    ]
   },
+  "plan-a-short-first-run": {
+   "domain": "PhysicalActivity",
+   "subclass": "RunningBasics",
+   "level": "Level1",
+   "title": "Plan a Short First Run 🏃",
+   "estimated_duration": 5,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "living_room",
+    "room",
+    "office",
+    "office_building",
+    "workplace",
+    "workplace_2",
+    "conference_room",
+    "school_building",
+    "university_building",
+    "cafeteria",
+    "community_health_centre",
+    "community_service_centre",
+    "day_care_facility",
+    "nursing_home",
+    "group_home_facility",
+    "long_term_care_facility",
+    "indoorbuildingspace"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
+    "feeling_exhausted",
+    "feeling_weak",
+    "low_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
+  "plan-meals-and-groceries": {
+   "domain": "Nutrition",
+   "subclass": "MealPlanningAndShopping",
+   "level": "Level4",
+   "title": "Plan Meals and Groceries 🗓️",
+   "estimated_duration": 60,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "indoor_kitchen",
+    "living_room",
+    "room",
+    "office",
+    "office_building",
+    "workplace",
+    "workplace_2",
+    "cafeteria",
+    "school_building",
+    "university_building",
+    "transport_hub",
+    "indoorbuildingspace"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
+    "feeling_weak",
+    "low_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
   "plan-sitting-breaks": {
    "domain": "PhysicalActivity",
    "subclass": "MovementPlanning",
@@ -1120,6 +1463,30 @@
     "low_emotional_management_exertion_expended_on_a_behaviour"
    ]
   },
+  "plan-sleep-time": {
+   "domain": "MentalWellbeing",
+   "subclass": "SleepAndEveningRoutine",
+   "level": "Level1",
+   "title": "Plan Sleep Time 💤",
+   "estimated_duration": 10,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "living_room",
+    "room",
+    "office",
+    "workplace",
+    "workplace_2"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
+    "feeling_weak",
+    "low_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
   "plan-this-week-s-exercises": {
    "domain": "PhysicalActivity",
    "subclass": "MovementPlanning",
@@ -1153,6 +1520,38 @@
     "feeling_tired",
     "feeling_energetic",
     "feeling_exhausted",
+    "feeling_weak",
+    "low_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
+  "plan-this-week-s-meals": {
+   "domain": "Nutrition",
+   "subclass": "MealPlanningAndShopping",
+   "level": "Level1",
+   "title": "Plan This Week's Meals 🗓️",
+   "estimated_duration": 45,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "indoor_kitchen",
+    "living_room",
+    "room",
+    "office",
+    "office_building",
+    "workplace",
+    "workplace_2",
+    "conference_room",
+    "cafeteria",
+    "school_building",
+    "university_building",
+    "transport_hub",
+    "indoorbuildingspace"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
     "feeling_weak",
     "low_emotional_management_exertion_expended_on_a_behaviour"
    ]
@@ -1231,6 +1630,27 @@
    ],
    "energy_links": [
     "feeling_tired",
+    "feeling_exhausted",
+    "feeling_weak"
+   ]
+  },
+  "prepare-a-sleep-friendly-room": {
+   "domain": "MentalWellbeing",
+   "subclass": "SleepAndEveningRoutine",
+   "level": "Level1",
+   "title": "Prepare a Sleep-Friendly Room 😴",
+   "estimated_duration": 5,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "living_room",
+    "room"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
     "feeling_exhausted",
     "feeling_weak"
    ]
@@ -1505,6 +1925,66 @@
     "low_emotional_management_exertion_expended_on_a_behaviour"
    ]
   },
+  "send-one-family-message": {
+   "domain": "MentalWellbeing",
+   "subclass": "SocialConnection",
+   "level": "Level1",
+   "title": "Send One Family Message 💬",
+   "estimated_duration": 10,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "living_room",
+    "room",
+    "office",
+    "office_building",
+    "workplace",
+    "workplace_2",
+    "school_building",
+    "university_building",
+    "university_campus",
+    "sports_facility",
+    "public_sports_field",
+    "playground",
+    "public_park",
+    "garden",
+    "domestic_garden",
+    "botanical_garden",
+    "outdoor_environment",
+    "sidewalk",
+    "transport_hub",
+    "business_park",
+    "industrial_park",
+    "outdoorbuildingspace",
+    "indoorbuildingspace",
+    "in_a_park",
+    "nursing_home",
+    "group_home_facility",
+    "long_term_care_facility",
+    "day_care_facility",
+    "healthcare_facility",
+    "community_health_centre",
+    "community_service_centre",
+    "restaurant",
+    "cafeteria",
+    "take_out_restaurant",
+    "conference_room",
+    "public_transit_system",
+    "public_bus",
+    "rapid_transit_system",
+    "car",
+    "bus"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
+    "feeling_exhausted",
+    "feeling_weak",
+    "low_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
   "set-a-podcast-sleep-timer": {
    "domain": "MentalWellbeing",
    "subclass": "SleepAndEveningRoutine",
@@ -1605,6 +2085,123 @@
     "low_emotional_management_exertion_expended_on_a_behaviour"
    ]
   },
+  "share-one-community-message": {
+   "domain": "MentalWellbeing",
+   "subclass": "SocialConnection",
+   "level": "Level2",
+   "title": "Share One Community Message 💬",
+   "estimated_duration": 10,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "living_room",
+    "room",
+    "office",
+    "office_building",
+    "workplace",
+    "workplace_2",
+    "school_building",
+    "university_building",
+    "university_campus",
+    "sports_facility",
+    "public_sports_field",
+    "playground",
+    "public_park",
+    "garden",
+    "domestic_garden",
+    "botanical_garden",
+    "outdoor_environment",
+    "sidewalk",
+    "transport_hub",
+    "business_park",
+    "industrial_park",
+    "outdoorbuildingspace",
+    "indoorbuildingspace",
+    "in_a_park",
+    "nursing_home",
+    "group_home_facility",
+    "long_term_care_facility",
+    "day_care_facility",
+    "healthcare_facility",
+    "community_health_centre",
+    "community_service_centre",
+    "restaurant",
+    "cafeteria",
+    "take_out_restaurant",
+    "conference_room",
+    "public_transit_system",
+    "public_bus",
+    "rapid_transit_system",
+    "car",
+    "bus"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
+    "feeling_exhausted",
+    "feeling_weak",
+    "low_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
+  "start-one-conversation": {
+   "domain": "MentalWellbeing",
+   "subclass": "SocialConnection",
+   "level": "Level2",
+   "title": "Start One Conversation 💬",
+   "estimated_duration": 10,
+   "location_links": [
+    "office",
+    "office_building",
+    "workplace",
+    "workplace_2",
+    "conference_room",
+    "school_building",
+    "university_building",
+    "university_campus",
+    "public_park",
+    "garden",
+    "outdoor_environment",
+    "sidewalk",
+    "transport_hub",
+    "public_transit_system",
+    "public_bus",
+    "rapid_transit_system",
+    "bus",
+    "restaurant",
+    "cafeteria",
+    "take_out_restaurant",
+    "grocery_store",
+    "supermarket",
+    "healthcare_facility",
+    "community_health_centre",
+    "community_service_centre",
+    "physician_office",
+    "nursing_home",
+    "group_home_facility",
+    "long_term_care_facility",
+    "day_care_facility",
+    "business_park",
+    "industrial_park",
+    "sports_facility",
+    "public_sports_field",
+    "playground",
+    "in_a_park",
+    "outdoorbuildingspace",
+    "indoorbuildingspace",
+    "home",
+    "home_2",
+    "household_environment"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
+    "feeling_exhausted",
+    "feeling_weak",
+    "low_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
   "step-outside-for-fresh-air": {
    "domain": "MentalWellbeing",
    "subclass": "FocusAndPhoneBoundaries",
@@ -1621,6 +2218,44 @@
     "playground",
     "in_a_park",
     "outdoorbuildingspace"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
+    "feeling_exhausted",
+    "feeling_weak",
+    "low_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
+  "stretch-for-5-minutes": {
+   "domain": "PhysicalActivity",
+   "subclass": "StretchingAndRecovery",
+   "level": "Level1",
+   "title": "Stretch for 5 Minutes 🤸",
+   "estimated_duration": 5,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "living_room",
+    "room",
+    "office",
+    "office_building",
+    "workplace",
+    "workplace_2",
+    "conference_room",
+    "school_building",
+    "university_building",
+    "sports_facility",
+    "nursing_home",
+    "group_home_facility",
+    "long_term_care_facility",
+    "day_care_facility",
+    "healthcare_facility",
+    "community_health_centre",
+    "community_service_centre",
+    "indoorbuildingspace"
    ],
    "energy_links": [
     "feeling_tired",
@@ -1651,6 +2286,40 @@
     "feeling_tired",
     "feeling_energetic",
     "feeling_weak"
+   ]
+  },
+  "take-a-slow-breathing-break": {
+   "domain": "MentalWellbeing",
+   "subclass": "CalmBreathingAndMindfulness",
+   "level": "Level2",
+   "title": "Take a Slow Breathing Break 🧘",
+   "estimated_duration": 5,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "living_room",
+    "room",
+    "office",
+    "office_building",
+    "workplace",
+    "workplace_2",
+    "conference_room",
+    "school_building",
+    "university_building",
+    "healthcare_facility",
+    "indoorbuildingspace",
+    "transport_hub",
+    "public_park",
+    "outdoor_environment"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
+    "feeling_exhausted",
+    "feeling_weak",
+    "low_emotional_management_exertion_expended_on_a_behaviour"
    ]
   },
   "tea-time": {
@@ -1827,6 +2496,80 @@
     "feeling_weak"
    ]
   },
+  "try-one-new-taste": {
+   "domain": "Nutrition",
+   "subclass": "SmartSnacking",
+   "level": "Level1",
+   "title": "Try One New Taste 😋",
+   "estimated_duration": 15,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "indoor_kitchen",
+    "restaurant",
+    "cafeteria",
+    "take_out_restaurant",
+    "office",
+    "workplace",
+    "workplace_2",
+    "school_building",
+    "university_building",
+    "indoorbuildingspace"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
+    "feeling_weak",
+    "low_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
+  "try-sparkling-water": {
+   "domain": "Nutrition",
+   "subclass": "BetterBeverageBalance",
+   "level": "Level2",
+   "title": "Try Sparkling Water ✨",
+   "estimated_duration": 15,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "indoor_kitchen",
+    "living_room",
+    "room",
+    "office",
+    "office_building",
+    "workplace",
+    "workplace_2",
+    "conference_room",
+    "restaurant",
+    "cafeteria",
+    "take_out_restaurant",
+    "school_building",
+    "university_building",
+    "transport_hub",
+    "healthcare_facility",
+    "community_health_centre",
+    "community_service_centre",
+    "day_care_facility",
+    "nursing_home",
+    "group_home_facility",
+    "long_term_care_facility",
+    "physician_office",
+    "business_park",
+    "industrial_park",
+    "indoorbuildingspace"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
+    "feeling_exhausted",
+    "feeling_weak",
+    "low_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
   "try-walk-run-intervals": {
    "domain": "PhysicalActivity",
    "subclass": "DailyStepsAndWalking",
@@ -1851,6 +2594,93 @@
     "feeling_energetic",
     "feeling_tired",
     "moderate_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
+  "turn-the-clock-away": {
+   "domain": "MentalWellbeing",
+   "subclass": "SleepAndEveningRoutine",
+   "level": "Level2",
+   "title": "Turn the Clock Away ⏰",
+   "estimated_duration": 5,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "living_room",
+    "room"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_exhausted",
+    "feeling_weak"
+   ]
+  },
+  "two-minute-workout": {
+   "domain": "PhysicalActivity",
+   "subclass": "StrengthAndBodyweightMoves",
+   "level": "Level1",
+   "title": "Two-Minute Workout 💪",
+   "estimated_duration": 2,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "living_room",
+    "room",
+    "sports_facility",
+    "nursing_home",
+    "group_home_facility",
+    "long_term_care_facility",
+    "day_care_facility",
+    "university_building",
+    "school_building",
+    "indoorbuildingspace"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
+    "feeling_exhausted",
+    "feeling_weak",
+    "low_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
+  "use-task-tracker": {
+   "domain": "MentalWellbeing",
+   "subclass": "StressAndSupportSkills",
+   "level": "Level3",
+   "title": "Use Task Tracker 🎯",
+   "estimated_duration": 20,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "living_room",
+    "room",
+    "office",
+    "office_building",
+    "workplace",
+    "workplace_2",
+    "conference_room",
+    "school_building",
+    "university_building",
+    "cafeteria",
+    "community_health_centre",
+    "community_service_centre",
+    "day_care_facility",
+    "nursing_home",
+    "group_home_facility",
+    "long_term_care_facility",
+    "indoorbuildingspace"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
+    "feeling_exhausted",
+    "feeling_weak",
+    "low_emotional_management_exertion_expended_on_a_behaviour"
    ]
   },
   "walk-4-000-to-6-000-steps": {
@@ -1972,6 +2802,32 @@
     "outdoorbuildingspace",
     "in_a_park",
     "sidewalk"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
+    "feeling_weak",
+    "low_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
+  "walk-one-routine-route": {
+   "domain": "PhysicalActivity",
+   "subclass": "DailyStepsAndWalking",
+   "level": "Level2",
+   "title": "Walk One Routine Route 🚶",
+   "estimated_duration": 25,
+   "location_links": [
+    "sidewalk",
+    "outdoor_environment",
+    "public_park",
+    "university_campus",
+    "in_a_park",
+    "outdoorbuildingspace",
+    "business_park",
+    "industrial_park",
+    "transport_hub",
+    "grocery_store",
+    "supermarket"
    ],
    "energy_links": [
     "feeling_tired",
@@ -2285,6 +3141,38 @@
     "nursing_home",
     "group_home_facility",
     "long_term_care_facility",
+    "indoorbuildingspace"
+   ],
+   "energy_links": [
+    "feeling_tired",
+    "feeling_energetic",
+    "feeling_exhausted",
+    "feeling_weak",
+    "low_emotional_management_exertion_expended_on_a_behaviour"
+   ]
+  },
+  "write-down-emotion": {
+   "domain": "MentalWellbeing",
+   "subclass": "CalmBreathingAndMindfulness",
+   "level": "Level1",
+   "title": "Write Down Emotion ✍️",
+   "estimated_duration": 15,
+   "location_links": [
+    "home",
+    "home_2",
+    "human_dwelling",
+    "household_environment",
+    "living_room",
+    "room",
+    "office",
+    "office_building",
+    "workplace",
+    "workplace_2",
+    "conference_room",
+    "school_building",
+    "university_building",
+    "transport_hub",
+    "public_transit_system",
     "indoorbuildingspace"
    ],
    "energy_links": [

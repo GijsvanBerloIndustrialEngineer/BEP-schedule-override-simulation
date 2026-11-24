@@ -239,12 +239,10 @@ override_model:
 # ------------------------------------------------------------------
 health_scenario:
   # Folders with calendar-bench solution files (<person_id>.json, with a
-  # "scheduled" list), one per planning method. Relative to this file.
+  # "scheduled" list). Used by `sensitivity.py --health-method <name>` to put
+  # the health tasks in the calendar. Relative to this file.
   solutions:
     human_coach: ../data/scenario_solutions/human_coach
-  # Planning methods built into v2 that place the SAME task batch
-  # (taken from the first solution above) into the base calendar.
-  builtin_methods: [fcfs_greedy_v2, random_slot_v2, context_aware_v2]
   health_task_catalog: ../data/health_task_catalog.json
   # Health tasks can always get an override, also concurrent ones.
   notify_health_tasks: null   # null = use notification_share

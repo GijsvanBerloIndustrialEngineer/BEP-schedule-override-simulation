@@ -24,10 +24,9 @@ import csv
 import statistics
 from pathlib import Path
 
-from common import load_setup, triggers_of, write_workbook
-from compare_planning_methods import mean_ci
+from common import load_setup, mean_ci, triggers_of, write_workbook
 from health_tasks import (
-    build_method, load_catalog, load_solution, placements_from_solution,
+    load_catalog, load_solution, placements_from_solution,
     task_batch_from_solution,
 )
 from model_v2 import DEFAULT_CONFIG, load_config, validate_parameters
@@ -120,19 +119,18 @@ def run_setting(tasks, setup, params, triggers, config, reps, extra_kpis=None):
 
 
 def health_tasks_for(config, setup, method):
+    """Health blocks as placed in the calendar-bench solution files of `method`."""
     hs = config["health_scenario"]
+    if method not in hs["solutions"]:
+        raise SystemExit(f"No solution folder for '{method}' under health_scenario.solutions")
     catalog = load_catalog(hs.get("health_task_catalog"))
     start = setup["horizon"][0].date()
-    first = next(iter(hs["solutions"].items()))
-    sol = load_solution(first[1], setup["person_id"])
+    sol = load_solution(hs["solutions"][method], setup["person_id"])
+    if sol is None:
+        raise SystemExit(f"No {method} solution for {setup['person_id']}")
     batch = task_batch_from_solution(sol, catalog, start)
-    if method in hs["solutions"]:
-        sol = load_solution(hs["solutions"][method], setup["person_id"])
-        return placements_from_solution(sol, batch, setup["person_id"],
-                                        setup["persona_id"], method, start)
-    batch.sort(key=lambda t: (t["week"], t["slug"]))
-    return build_method(method, batch, setup, setup["params"], config["persona"],
-                        hs.get("seed", 0))[0]
+    return placements_from_solution(sol, batch, setup["person_id"],
+                                    setup["persona_id"], method, start)
 
 
 def tornado(path, rows, kpi):
@@ -171,7 +169,7 @@ def main(argv=None):
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--replications", type=int, default=10)
     parser.add_argument("--health-method", default=None,
-                        help="add the health tasks of this planning method")
+                        help="add the health tasks of this calendar-bench solution folder (e.g. human_coach)")
     parser.add_argument("--skip-oat", action="store_true")
     parser.add_argument("--skip-ablation", action="store_true")
     args = parser.parse_args(argv)

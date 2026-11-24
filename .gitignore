@@ -21,3 +21,9 @@ data/*
 # Experiment results are kept in git
 !results/**/*.ics
 !results/**/*.xlsx
+
+# calendar-bench calendars of the whole population are kept in git,
+# but not the version 1 output written next to them
+!calendar_bench_population/ics/*.ics
+calendar_bench_population/ics/*_executed_run*.ics
+calendar_bench_population/ics/*_calendar_bench/

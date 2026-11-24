@@ -82,14 +82,13 @@ Range in the sensitivity analysis: the whole block ×0 – ×2.
 
 Weight of an activity = `base_weight` × the multipliers of the active contexts × `m ** ((trait − 0.5) / 0.5)` per trait multiplier. All base weights, multipliers and `max_minutes` are **ASSUMPTION**. The direction of `screen_time` and `snack` under negative mood or stress follows procrastination as mood repair (Sirois & Pychyl, 2013). The activities map onto calendar-bench catalog events (`napping`, `snacking`, `socialising`, `reading`, `walking`), so the executed calendar can be scored by calendar-bench; `screen_time` is not a catalog event.
 
-## 8. Health scenario
+## 8. Health tasks
 
 | Parameter | Value | Status |
 |---|---|---|
 | Task batch (tasks, weeks, duration, intensity, flags) | from the human coach solution of the person | CB |
 | Human coach placements | `human_coach_schedules/<person>.json` | CB |
-| Domain and sub-class of a task | HealthTasks ontology; keyword fallback for 15 task slugs that aren't in the ontology (see sheet *Task batch*, column *Domain source*) | CB / ASSUMPTION |
-| `fcfs_greedy_v2`, `random_slot_v2`, `context_aware_v2` | built into v2 | ASSUMPTION (see README) |
+| Domain and sub-class of a task | HealthTasks ontology; keyword fallback (`v2/src/health_tasks.py`) for task slugs that aren't in the ontology | CB / ASSUMPTION |
 
 ## 9. Method references (sensitivity analysis, output analysis)
 
