@@ -14,7 +14,7 @@ Version 1 (`../src`, `../config`) shows that the mechanism works. Version 2 has 
 Also new:
 
 - **Task-start trigger**: besides the Poisson arrivals (v1), every eligible task gets one decision at its planned start, and again at its new start after a postponement. Without it, a 10-minute health task is hit by an arrival only ~6% of the time. Set `triggers.task_start: false` for v1 behaviour.
-- **Health scenario**: the calendar-bench `healthy_lifestyle_promotion` health tasks are added to the person's calendar per planning method, and completion is compared (`src/compare_planning_methods.py`).
+- **Health tasks**: the calendar-bench `healthy_lifestyle_promotion` health tasks can be added to the calendar as the human coach placed them (`sensitivity.py --health-method human_coach`).
 - v1's per-persona base probabilities are dropped: persona differences now come from the traits.
 
 ## Run it
@@ -30,43 +30,23 @@ python v2/src/run_simulation.py
 ```
 
 ```bash
-python v2/src/compare_planning_methods.py
-```
-
-```bash
 python v2/src/sensitivity.py --replications 10
 ```
 
-Without a calendar argument, the scripts use `default_calendar` from [`config/v2_config.yaml`](config/v2_config.yaml) (`data/diligent_anxious_active_0000.ics`, which is not in git; pass another `.ics` as the first argument). Output goes to `v2/output/` (not in git). Run times on a laptop: about 1 min, 4 min and 9 min.
+Without a calendar argument, the scripts use `default_calendar` from [`config/v2_config.yaml`](config/v2_config.yaml) (`data/diligent_anxious_active_0000.ics`, which is not in git; pass another `.ics` as the first argument). Output goes to `v2/output/` (not in git). Run times on a laptop: about 1 min and 9 min.
 
 | Script | Output |
 |---|---|
 | `run_simulation.py` | `<calendar>_v2_simulation.xlsx` (KPIs with 95% CI, changes incl. replacement activity and days moved, decisions with active context, persona traits, parameters), executed `.ics`, calendar-bench JSON |
-| `compare_planning_methods.py` | `<calendar>_planning_methods.xlsx/.csv/.png`: health-task completion per method, per domain and per intensity |
 | `sensitivity.py` | `<calendar>_sensitivity.xlsx/.csv`, `_sensitivity_tornado.png`: one-at-a-time low/high per parameter group, plus the **ablation** (v1 inputs → + context → + persona → both) |
 
 `sensitivity.py --health-method human_coach` runs the same analysis with the health tasks in the calendar and adds *Health completion* as a KPI.
 
-## Health scenario: planning methods
+## Health tasks
 
-calendar-bench only publishes the output of the **human coach** (`human_coach_schedules/`). The other scenarios (PTIME, greedy, LLM augmenters, MAS, DQN) need their own run of calendar-bench (LLM API keys, Neo4j), and their output isn't in the repository. So the comparison has:
+calendar-bench publishes the output of the **human coach** (`human_coach_schedules/`) for all 30 persons; they are in `data/scenario_solutions/human_coach/`. `sensitivity.py --health-method human_coach` adds those health tasks to the calendar and reports *Health completion*.
 
-| Method | What it is |
-|---|---|
-| `human_coach` | **calendar-bench output**: the human coach's placements for this person |
-| `fcfs_greedy_v2` | re-implementation of calendar-bench's *documented* FCFS greedy (earliest untouched free gap that fits), on the same task batch. Not calendar-bench's own code or output |
-| `random_slot_v2` | random free slot in the task's week (context-blind baseline) |
-| `context_aware_v2` | free slot in the task's week with the highest predicted p(no override) under the v2 model (context, persona and fill at the start) |
-
-All methods place the same task batch (164 tasks over 8 weeks for `diligent_anxious_active_0000`, taken from the human coach file) and use the same seeds. A task counts as completed when all its pieces are executed in full.
-
-Caveats when you report this:
-
-- `context_aware_v2` plans with the same model it's evaluated with, so its advantage is an upper bound: "what if the planner knew the person's context". Its result depends on the assumed context coefficients.
-- The human coach splits dividable tasks into pieces (208 pieces for 164 tasks). Each piece faces its own decisions, which lowers "all pieces done".
-- The calendars of all 30 persons are in `../calendar_bench_population/ics/` and their human coach files in `data/scenario_solutions/human_coach/`, so the comparison runs for any person: pass their `.ics` as the first argument.
-
-To add a real calendar-bench method's output later: put its `<person_id>.json` solution files in a folder and run `compare_planning_methods.py --solutions ptime=path/to/folder`, or add the folder under `health_scenario.solutions` in the config.
+Comparing planning methods is not done in this repository: the plan is to run the override simulation inside calendar-bench, so each calendar-bench planner gets execution KPIs there.
 
 ## Files
 
@@ -82,10 +62,9 @@ v2/
 ├── src/
 │   ├── model_v2.py               # logit with context + persona, replacement choice
 │   ├── simulation_v2.py          # event loop: triggers, week-long replanning, replacements
-│   ├── health_tasks.py           # calendar-bench solutions, task batch, built-in planners
+│   ├── health_tasks.py           # health tasks from calendar-bench solution files
 │   ├── common.py                 # setup, Excel/.ics/JSON output
 │   ├── run_simulation.py         # entry: one calendar
-│   ├── compare_planning_methods.py
 │   └── sensitivity.py            # OAT + ablation
 └── tools/import_calendar_bench.py   # copies inputs from a calendar-bench checkout (read-only)
 ```

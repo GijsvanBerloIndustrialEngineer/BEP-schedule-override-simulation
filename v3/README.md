@@ -41,15 +41,10 @@ python v3/src/run_simulation.py
 python v3/src/stage_ablation.py --replications 10
 ```
 
-```bash
-python v3/src/compare_planning_methods.py
-```
-
 | Script | Output (in `v3/output/`, not in git) |
 |---|---|
 | `run_simulation.py` | `<calendar>_v3_simulation.xlsx` (KPIs with 95% CI, execution states, review and start decisions, changes, tasks), executed `.ics`, calendar-bench JSON |
 | `stage_ablation.py` | Contribution of each stage: execution only, + review, + progress, full v3 |
-| `compare_planning_methods.py` | Health-task execution states per planning method (same methods as v2) |
 
 ## New parameters
 

@@ -5,6 +5,7 @@ Loading the calendar, the calendar-bench experiment and the temporal rules
 is done with the unchanged v1 functions (../../src).
 """
 
+import statistics
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -22,9 +23,21 @@ from calendar_bench_link import load_experiment  # noqa: E402  (v1)
 from rules import parse_rules  # noqa: E402  (v1)
 from simulation import load_calendar, calendar_horizon  # noqa: E402  (v1)
 from calendar_bench_export import write_calendar_bench_json  # noqa: E402  (v1)
-from override_simulation import summarise_kpis  # noqa: E402  (v1)
+from override_simulation import summarise_kpis, t_quantile_975  # noqa: E402  (v1)
 
 from model_v2 import parameters_for  # noqa: E402
+
+
+def mean_ci(values):
+    """Mean and 95% confidence interval (t distribution) over replications."""
+    values = [v for v in values if v is not None]
+    if not values:
+        return None, None, None
+    m = statistics.mean(values)
+    if len(values) < 2:
+        return m, None, None
+    half = t_quantile_975(len(values) - 1) * statistics.stdev(values) / len(values) ** 0.5
+    return m, m - half, m + half
 
 
 def load_setup(config, ics_file):

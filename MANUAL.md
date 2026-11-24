@@ -7,7 +7,7 @@ The simulation has three versions. Each later version imports the code of the ea
 | Part | Sections | Version |
 |---|---|---|
 | A | 1–12 | **Version 1**: the base mechanism, its inputs, output and scoring with calendar-bench |
-| B | 13 | **Version 2** (`v2/`): context and persona in the decision, replacement activities, week-long replanning, task-start trigger, health scenario, sensitivity analysis |
+| B | 13 | **Version 2** (`v2/`): context and persona in the decision, replacement activities, week-long replanning, task-start trigger, health tasks, sensitivity analysis |
 | C | 14 | **Version 3** (`v3/`): review of the day in advance and partial execution |
 | D | 15 | **Input calendars**: the 30 calendars of the calendar-bench population (`calendar_bench_population/`) |
 
@@ -421,11 +421,10 @@ Version 2 keeps the loop of section 1 and the code of `src/` (calendar loading, 
 ```bash
 pip install -r v2/requirements.txt
 python v2/src/run_simulation.py [calendar.ics]
-python v2/src/compare_planning_methods.py [calendar.ics] [--solutions name=folder ...]
 python v2/src/sensitivity.py [calendar.ics] [--replications 10] [--health-method human_coach] [--skip-oat] [--skip-ablation]
 ```
 
-Without a calendar, `default_calendar` from the config is used (`data/diligent_anxious_active_0000.ics`). Output goes to `v2/output/`. Run times on a laptop: about 1, 4 and 9 minutes.
+Without a calendar, `default_calendar` from the config is used (`data/diligent_anxious_active_0000.ics`). Output goes to `v2/output/`. Run times on a laptop: about 1 and 9 minutes.
 
 ### 13.2 Triggers
 
@@ -460,20 +459,11 @@ The **Decisions** sheet shows, per decision, the active context covariates and t
 | Replace | A concrete activity instead of `UNPLANNED`: rest (`napping`), snack (`snacking`), socialise, read, screen time or walk outside. Weight = base weight × multipliers of the active contexts × trait multipliers. All except screen time are calendar-bench catalog events, so they are scored in the calendar-bench JSON |
 | Skip | As version 1 |
 
-### 13.5 Health scenario and planning methods (`compare_planning_methods.py`)
+### 13.5 Health tasks (human coach)
 
-The health tasks of the calendar-bench `healthy_lifestyle_promotion` scenario are added to the person's calendar by several planning methods, and their completion is compared under the same seeds.
+The health tasks of the calendar-bench `healthy_lifestyle_promotion` scenario can be added to the person's calendar exactly as the **human coach** placed them (`v2/data/scenario_solutions/human_coach/<person>.json`, published by calendar-bench). Health tasks can always get an override, also concurrent ones; a health task counts as completed when all its pieces are executed in full. Domain and sub-class come from `v2/data/health_task_catalog.json` (HealthTasks ontology). This is used by `sensitivity.py --health-method human_coach` (section 13.6).
 
-| Method | Source |
-|---|---|
-| `human_coach` | calendar-bench output: `v2/data/scenario_solutions/human_coach/<person>.json` |
-| `fcfs_greedy_v2` | Re-implementation of calendar-bench's documented FCFS greedy (earliest free gap that fits) |
-| `random_slot_v2` | Random free slot in the task's week |
-| `context_aware_v2` | Free slot in the task's week with the highest predicted p(no override); an upper bound, because it plans with the model it is evaluated with |
-
-All methods place the same task batch, taken from the human coach file. A health task counts as completed when all its pieces are executed in full. Domain and sub-class come from `v2/data/health_task_catalog.json` (HealthTasks ontology). Output: `<calendar>_planning_methods.xlsx/.csv/.png`, with completion per method, per domain and per intensity.
-
-To add another method's output: put its `<person_id>.json` files in a folder and pass `--solutions name=path/to/folder`, or add the folder under `health_scenario.solutions` in the config. To add the human coach file of other persons: `python v2/tools/import_calendar_bench.py --calendar-bench path/to/calendar-bench --persons <person_id> ...` (reads calendar-bench, does not change it).
+Comparing planning methods is not done in this repository: the plan is to run the override simulation inside calendar-bench, so each calendar-bench planner gets execution KPIs there.
 
 ### 13.6 Sensitivity analysis (`sensitivity.py`)
 
@@ -502,7 +492,6 @@ Version 2 had one decision about a planned task, at the moment it is due. Versio
 ```bash
 python v3/src/run_simulation.py [calendar.ics]
 python v3/src/stage_ablation.py [calendar.ics] [--replications 10]
-python v3/src/compare_planning_methods.py [calendar.ics] [--solutions name=folder ...]
 ```
 
 Output goes to `v3/output/`.
@@ -545,7 +534,6 @@ Two flags record what happened on the way: *moved at review* and *postponed at s
 | → **Tasks (run 1)** | Every planned task with planned and executed hours, state and the two flags |
 | `<calendar>_v3_executed_run1.ics`, `<calendar>_v3_calendar_bench/` | Executed calendar and calendar-bench JSON; score them with section 12 |
 | `<calendar>_v3_stage_ablation.xlsx/.csv` | Contribution of each stage: execution only, + review, + progress, full v3 |
-| `<calendar>_v3_planning_methods.xlsx/.csv` | Health-task execution states per planning method (same methods as section 13.5) |
 
 ### 14.5 Limitations of version 3
 
@@ -580,11 +568,11 @@ python v3/src/run_simulation.py calendar_bench_population/ics/free_spirited_soci
 - The persona is read from the person id, so the persona parameter set (version 1) or the persona traits (versions 2 and 3) follow automatically.
 - Version 1 writes its output next to the `.ics`, inside `calendar_bench_population/ics/`. Those files are ignored by git. Keep the repository in a short path on Windows: the output path of version 1 must stay under 260 characters.
 - Versions 2 and 3 use the persona **mean** traits (`persona.trait_source: mean`), not the sampled values in `persons/<person_id>.json`.
-- The health-scenario comparison (sections 13.5, 14.1) needs the human coach file of the person in `v2/data/scenario_solutions/human_coach/`. The files of all 30 persons are there (imported from calendar-bench commit `2c823c2` with `v2/tools/import_calendar_bench.py`), so the comparison runs for every population calendar.
+- `sensitivity.py --health-method human_coach` (section 13.5) needs the human coach file of the person in `v2/data/scenario_solutions/human_coach/`. The files of all 30 persons are there (imported from calendar-bench commit `2c823c2` with `v2/tools/import_calendar_bench.py`).
 
 ### Scenario output of the other planning methods
 
-The scenario definitions (`scenarios.yaml`: the weekly ramp of the Progressive Healthy Lifestyle Challenge, the LLM augmenters, greedy, PTIME and DQN) are in `calendar_bench_configs/experiments/healthy_lifestyle_promotion/` and are identical to the calendar-bench repository. calendar-bench publishes only the output of the **human coach**; the output of the other methods needs a calendar-bench run of its own (LLM API keys, Neo4j). When those solution files are available, add them as described in section 13.5.
+The scenario definitions (`scenarios.yaml`: the weekly ramp of the Progressive Healthy Lifestyle Challenge, the LLM augmenters, greedy, PTIME and DQN) are in `calendar_bench_configs/experiments/healthy_lifestyle_promotion/` and are identical to the calendar-bench repository. calendar-bench publishes only the output of the human coach. Comparing planning methods is not done in this repository: the plan is to run the override simulation inside calendar-bench, so each calendar-bench planner gets execution KPIs there.
 
 To run the whole population, loop over the folder, for example in PowerShell:
 

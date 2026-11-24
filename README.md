@@ -12,7 +12,7 @@ The simulation was built in three versions. Each version leaves the earlier ones
 | Version | Folder | Question | What it adds |
 |---|---|---|---|
 | **1** | [`src/`](src), [`config/`](config) | Does the override mechanism work? | Poisson arrivals, multinomial logit (postpone / skip / replace), same-day postponement, KPIs with confidence intervals, calendar-bench scoring |
-| **2** | [`v2/`](v2/README.md) | How strongly do context and persona make execution deviate from the plan? | Context covariates from the `[ctx:...]` episodes, Big Five traits, concrete replacement activities, week-long replanning, a decision at every task start, the health scenario with planning methods, sensitivity analysis |
+| **2** | [`v2/`](v2/README.md) | How strongly do context and persona make execution deviate from the plan? | Context covariates from the `[ctx:...]` episodes, Big Five traits, concrete replacement activities, week-long replanning, a decision at every task start, health tasks from the human coach scenario, sensitivity analysis |
 | **3** | [`v3/`](v3/README.md) | Which moment causes the deviation: revising the plan, starting, or finishing? | Two-stage model: a **review** of the day in advance (keep / move / drop) and **execution** at the planned time (start decision + progress: finish or stop part-way), with five execution states |
 
 All parameters in all versions are **assumptions**, not fitted to data. Version 2 documents the source status of every parameter in [`v2/PARAMETERS.md`](v2/PARAMETERS.md).
@@ -56,7 +56,6 @@ python src/simulation.py path/to/calendar.ics
 
 ```bash
 python v2/src/run_simulation.py path/to/calendar.ics
-python v2/src/compare_planning_methods.py path/to/calendar.ics
 python v2/src/sensitivity.py path/to/calendar.ics --replications 10
 ```
 
@@ -65,16 +64,17 @@ python v2/src/sensitivity.py path/to/calendar.ics --replications 10
 ```bash
 python v3/src/run_simulation.py path/to/calendar.ics
 python v3/src/stage_ablation.py path/to/calendar.ics --replications 10
-python v3/src/compare_planning_methods.py path/to/calendar.ics
 ```
 
 | Version | Output folder | Main files |
 |---|---|---|
 | 1 | next to the `.ics` (or `output.dir`) | `<calendar>_override_simulation.xlsx`, `<calendar>_executed_run1.ics`, `<calendar>_calendar_bench/` |
-| 2 | `v2/output/` | `<calendar>_v2_simulation.xlsx`, `_planning_methods.xlsx/.csv/.png`, `_sensitivity.xlsx/.csv`, `_sensitivity_tornado.png`, executed `.ics`, calendar-bench JSON |
-| 3 | `v3/output/` | `<calendar>_v3_simulation.xlsx`, `_v3_stage_ablation.xlsx/.csv`, `_v3_planning_methods.xlsx/.csv`, executed `.ics`, calendar-bench JSON |
+| 2 | `v2/output/` | `<calendar>_v2_simulation.xlsx`, `_sensitivity.xlsx/.csv`, `_sensitivity_tornado.png`, executed `.ics`, calendar-bench JSON |
+| 3 | `v3/output/` | `<calendar>_v3_simulation.xlsx`, `_v3_stage_ablation.xlsx/.csv`, executed `.ics`, calendar-bench JSON |
 
 Output folders are not tracked by git, except the results stored under [`results/`](results).
+
+Comparing planning methods is not done in this repository: the plan is to run the override simulation inside calendar-bench, so each calendar-bench planner gets execution KPIs there.
 
 ### Scoring with calendar-bench
 
@@ -97,7 +97,7 @@ python tools/validate_with_calendar_bench.py --calendar-bench path/to/calendar-b
 │   ├── calendar_bench_link.py  # Reads the calendar-bench configs and matches events to them
 │   └── calendar_bench_export.py # Writes calendars in calendar-bench's JSON format
 ├── config/override_config.yaml # Settings of version 1
-├── v2/                         # Version 2 (context, persona, health scenario, sensitivity)
+├── v2/                         # Version 2 (context, persona, health tasks, sensitivity)
 │   ├── README.md, PARAMETERS.md
 │   ├── config/v2_config.yaml
 │   ├── data/                   # Human coach schedules and health-task catalog from calendar-bench
