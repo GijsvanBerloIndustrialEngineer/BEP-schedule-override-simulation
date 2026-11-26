@@ -1,0 +1,17 @@
+{"placements": [
+{"task":"W2T01","date":"2026-07-14","start":"08:30"},
+{"task":"W2T02","date":"2026-07-15","start":"12:50"},
+{"task":"W2T03","date":"2026-07-13","start":"06:40"},
+{"task":"W2T04","date":"2026-07-15","start":"14:10"},
+{"task":"W2T05","date":"2026-07-16","start":"12:00"},
+{"task":"W2T06","date":"2026-07-15","start":"18:40"},
+{"task":"W2T07","date":"2026-07-15","start":"09:20"},
+{"task":"W2T08","date":"2026-07-16","start":"12:30"},
+{"task":"W2T09","date":"2026-07-17","start":"12:00"},
+{"task":"W2T10","date":"2026-07-14","start":"12:00"},
+{"task":"W2T11","date":"2026-07-14","start":"11:40"},
+{"task":"W2T12","date":"2026-07-13","start":"09:10"},
+{"task":"W2T13","date":"2026-07-13","start":"12:00"},
+{"task":"W2T14","date":"2026-07-13","start":"11:30"}
+],
+"lessons":"Week 1 had 100% completion everywhere, so no factor is discriminating yet. I assume this caregiver follows through best in midday windows (12:00-14:00, psychological capability/physical opportunity) and mornings with physical opportunity. Walks go in those slots. Short alongside tasks are anchored to lunch and routines. One social task sits in the habitual early evening. Tasks are spread over weekdays; weekends and low-opportunity evenings are avoided."}

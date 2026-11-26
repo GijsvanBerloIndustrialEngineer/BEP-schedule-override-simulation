@@ -1,0 +1,49 @@
+person,comparison,kpi,mean_diff,ci_low,ci_high,reps_better
+diligent_anxious_active_0000,learning - static,Health completion (all tasks),0.019817073170731725,0.004245020525289172,0.035389125816174274,12/20
+diligent_anxious_active_0000,learning - static,Health completion (weeks 2-8),0.01980519480519479,0.00416943049217006,0.035440959118219525,12/20
+diligent_anxious_active_0000,learning - static,Base calendar completion,-0.009479166666666688,-0.017466149836615756,-0.0014921834967176178,5/20
+diligent_anxious_active_0000,learning - static,Plan-execution deviation (h),1.4158486522222204,-5.272985340472156,8.104682644916597,10/20
+diligent_anxious_active_0000,static - human_coach,Health completion (all tasks),0.04542682926829268,0.027848153530697386,0.06300550500588797,19/20
+diligent_anxious_active_0000,static - human_coach,Health completion (weeks 2-8),0.04577922077922077,0.028349944851553368,0.06320849670688816,18/20
+diligent_anxious_active_0000,static - human_coach,Base calendar completion,-0.012500000000000006,-0.020688202826291524,-0.004311797173708486,4/20
+diligent_anxious_active_0000,static - human_coach,Plan-execution deviation (h),-1.1715775242916664,-6.733548837222491,4.390393788639159,11/20
+diligent_anxious_active_0000,learning - human_coach,Health completion (all tasks),0.0652439024390244,0.047674372576593,0.08281343230145581,19/20
+diligent_anxious_active_0000,learning - human_coach,Health completion (weeks 2-8),0.06558441558441556,0.04677554428319379,0.08439328688563734,19/20
+diligent_anxious_active_0000,learning - human_coach,Base calendar completion,-0.021979166666666695,-0.027370616526803282,-0.01658771680653011,0/20
+diligent_anxious_active_0000,learning - human_coach,Plan-execution deviation (h),0.24427112793055414,-6.105600549367023,6.594142805228132,10/20
+free_spirited_social_student_0000,learning - static,Health completion (all tasks),0.00679012345679012,-0.014040243771718591,0.02762049068529883,11/20
+free_spirited_social_student_0000,learning - static,Health completion (weeks 2-8),0.004934210526315796,-0.016857698882430126,0.026726119935061722,12/20
+free_spirited_social_student_0000,learning - static,Base calendar completion,0.009745762711864425,0.002761103548342308,0.016730421875386543,14/20
+free_spirited_social_student_0000,learning - static,Plan-execution deviation (h),11.582474853416672,4.43898929236247,18.725960414470876,6/20
+free_spirited_social_student_0000,static - human_coach,Health completion (all tasks),0.03827160493827161,0.01946483124574857,0.057078378630794645,16/20
+free_spirited_social_student_0000,static - human_coach,Health completion (weeks 2-8),0.042763157894736836,0.02363884549363275,0.06188747029584092,17/20
+free_spirited_social_student_0000,static - human_coach,Base calendar completion,-0.03516949152542376,-0.04397019358659225,-0.026368789464255263,0/20
+free_spirited_social_student_0000,static - human_coach,Plan-execution deviation (h),-15.038834496208334,-23.376914494603497,-6.700754497813174,17/20
+free_spirited_social_student_0000,learning - human_coach,Health completion (all tasks),0.04506172839506173,0.024206071354857542,0.06591738543526592,16/20
+free_spirited_social_student_0000,learning - human_coach,Health completion (weeks 2-8),0.047697368421052634,0.02498608885157763,0.07040864799052764,15/20
+free_spirited_social_student_0000,learning - human_coach,Base calendar completion,-0.02542372881355933,-0.034813829014546264,-0.016033628612572397,2/20
+free_spirited_social_student_0000,learning - human_coach,Plan-execution deviation (h),-3.4563596427916634,-13.980148164811236,7.0674288792279105,11/20
+unemployed_family_caregiver_0000,learning - static,Health completion (all tasks),0.008227848101265816,-0.011281225544490786,0.02773692174702242,13/20
+unemployed_family_caregiver_0000,learning - static,Health completion (weeks 2-8),0.008108108108108091,-0.013057537595994234,0.029273753812210417,13/20
+unemployed_family_caregiver_0000,learning - static,Base calendar completion,0.011458333333333338,0.0038847366013670774,0.019031930065299598,16/20
+unemployed_family_caregiver_0000,learning - static,Plan-execution deviation (h),9.128419388861118,2.9472306096568266,15.30960816806541,6/20
+unemployed_family_caregiver_0000,static - human_coach,Health completion (all tasks),0.0490506329113924,0.030921205785482738,0.06718006003730206,18/20
+unemployed_family_caregiver_0000,static - human_coach,Health completion (weeks 2-8),0.048648648648648644,0.027064425750722973,0.07023287154657432,18/20
+unemployed_family_caregiver_0000,static - human_coach,Base calendar completion,-0.01579861111111111,-0.024761129841807797,-0.006836092380414422,5/20
+unemployed_family_caregiver_0000,static - human_coach,Plan-execution deviation (h),-3.3455720060138945,-11.210970332054124,4.519826320026336,12/20
+unemployed_family_caregiver_0000,learning - human_coach,Health completion (all tasks),0.05727848101265822,0.03790301036222573,0.07665395166309072,17/20
+unemployed_family_caregiver_0000,learning - human_coach,Health completion (weeks 2-8),0.05675675675675674,0.0362786229058811,0.07723489060763238,17/20
+unemployed_family_caregiver_0000,learning - human_coach,Base calendar completion,-0.004340277777777774,-0.011946378383698022,0.0032658228281424737,9/20
+unemployed_family_caregiver_0000,learning - human_coach,Plan-execution deviation (h),5.782847382847224,-1.095459209872299,12.661153975566748,8/20
+mean of 3 persons,learning - static,Health completion (all tasks),0.011611681576262554,0.00016640149905837627,0.023056961653466733,15/20
+mean of 3 persons,learning - static,Health completion (weeks 2-8),0.01094917114653956,-0.0013904762400762539,0.023288818533155377,12/20
+mean of 3 persons,learning - static,Base calendar completion,0.003908309792843691,-7.818156351221354e-05,0.007894801149199597,14/20
+mean of 3 persons,learning - static,Plan-execution deviation (h),7.375580964833337,3.6090553604700157,11.142106569196658,3/20
+mean of 3 persons,static - human_coach,Health completion (all tasks),0.0442496890393189,0.034104234676113586,0.05439514340252421,20/20
+mean of 3 persons,static - human_coach,Health completion (weeks 2-8),0.04573034244086875,0.034617538432701905,0.0568431464490356,20/20
+mean of 3 persons,static - human_coach,Base calendar completion,-0.021156034212178293,-0.026328081841251093,-0.015983986583105493,0/20
+mean of 3 persons,static - human_coach,Plan-execution deviation (h),-6.518661342171298,-11.787371940877893,-1.2499507434647041,14/20
+mean of 3 persons,learning - human_coach,Health completion (all tasks),0.055861370615581454,0.04553688477454433,0.06618585645661858,20/20
+mean of 3 persons,learning - human_coach,Health completion (weeks 2-8),0.05667951358740831,0.0468371262710445,0.06652190090377212,20/20
+mean of 3 persons,learning - human_coach,Base calendar completion,-0.0172477244193346,-0.02138593340389809,-0.013109515434771108,0/20
+mean of 3 persons,learning - human_coach,Plan-execution deviation (h),0.8569196226620382,-4.435825566675377,6.149664811999453,11/20

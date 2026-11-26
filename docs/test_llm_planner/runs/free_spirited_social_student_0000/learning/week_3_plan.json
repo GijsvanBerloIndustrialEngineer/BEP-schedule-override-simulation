@@ -1,0 +1,20 @@
+{"placements": [
+{"task": "W3T02", "date": "2026-07-20", "start": "12:10"},
+{"task": "W3T08", "date": "2026-07-20", "start": "12:30"},
+{"task": "W3T01", "date": "2026-07-20", "start": "13:00"},
+{"task": "W3T03", "date": "2026-07-21", "start": "12:10"},
+{"task": "W3T15", "date": "2026-07-21", "start": "12:40"},
+{"task": "W3T12", "date": "2026-07-21", "start": "07:00"},
+{"task": "W3T09", "date": "2026-07-22", "start": "12:10"},
+{"task": "W3T06", "date": "2026-07-22", "start": "12:40"},
+{"task": "W3T11", "date": "2026-07-22", "start": "13:00"},
+{"task": "W3T04", "date": "2026-07-23", "start": "12:10"},
+{"task": "W3T07", "date": "2026-07-23", "start": "21:00"},
+{"task": "W3T10", "date": "2026-07-24", "start": "12:10"},
+{"task": "W3T17", "date": "2026-07-24", "start": "13:00"},
+{"task": "W3T13", "date": "2026-07-25", "start": "10:00"},
+{"task": "W3T16", "date": "2026-07-25", "start": "11:10"},
+{"task": "W3T14", "date": "2026-07-26", "start": "09:00"},
+{"task": "W3T05", "date": "2026-07-26", "start": "21:00"}
+],
+"lessons": "Intensity-1 and midday weekday windows (12:00-13:30) plus long weekend morning windows get done reliably; evenings are social and less reliable, so only alongside tasks go late. Spread tasks at most two or three per day, cardio and walks at lunch, long walk and coffee chat on Saturday morning, avoid early mornings and evening standalone tasks."}

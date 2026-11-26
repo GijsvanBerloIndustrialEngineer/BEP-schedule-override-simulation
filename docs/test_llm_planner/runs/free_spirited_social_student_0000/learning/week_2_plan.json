@@ -1,0 +1,17 @@
+{"placements": [
+{"task": "W2T01", "date": "2026-07-13", "start": "12:10"},
+{"task": "W2T02", "date": "2026-07-14", "start": "12:10"},
+{"task": "W2T03", "date": "2026-07-14", "start": "17:10"},
+{"task": "W2T04", "date": "2026-07-13", "start": "07:00"},
+{"task": "W2T05", "date": "2026-07-18", "start": "10:00"},
+{"task": "W2T06", "date": "2026-07-19", "start": "10:00"},
+{"task": "W2T07", "date": "2026-07-15", "start": "10:00"},
+{"task": "W2T08", "date": "2026-07-16", "start": "12:30"},
+{"task": "W2T09", "date": "2026-07-17", "start": "12:10"},
+{"task": "W2T10", "date": "2026-07-15", "start": "13:00"},
+{"task": "W2T11", "date": "2026-07-18", "start": "10:30"},
+{"task": "W2T12", "date": "2026-07-19", "start": "10:30"},
+{"task": "W2T13", "date": "2026-07-15", "start": "12:10"},
+{"task": "W2T14", "date": "2026-07-17", "start": "14:00"}
+],
+"lessons": "Low-effort intensity-1 tasks are done reliably; midday free windows (12:00-13:30) and weekend mornings with long free windows work best. Evenings are social and unreliable, so only one short task sits near 17:00. Tasks are spread over the week with at most two or three per day, and alongside tasks sit at routine moments such as lunch and morning."}

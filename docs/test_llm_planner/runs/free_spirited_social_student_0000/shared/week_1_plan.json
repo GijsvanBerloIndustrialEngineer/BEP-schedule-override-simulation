@@ -1,0 +1,13 @@
+{"placements": [
+{"task": "W1T01", "date": "2026-07-07", "start": "10:00"},
+{"task": "W1T02", "date": "2026-07-06", "start": "12:30"},
+{"task": "W1T03", "date": "2026-07-08", "start": "14:00"},
+{"task": "W1T04", "date": "2026-07-07", "start": "12:10"},
+{"task": "W1T05", "date": "2026-07-11", "start": "10:00"},
+{"task": "W1T06", "date": "2026-07-10", "start": "07:00"},
+{"task": "W1T07", "date": "2026-07-08", "start": "13:10"},
+{"task": "W1T08", "date": "2026-07-08", "start": "12:30"},
+{"task": "W1T09", "date": "2026-07-12", "start": "10:00"},
+{"task": "W1T10", "date": "2026-07-11", "start": "15:10"}
+],
+"lessons": "Assumes a free-spirited, social student follows through best on low-effort tasks tied to existing routines (lunch, midday breaks) and on weekend mornings with long free windows. Intense or early workouts are kept few, placed in observed physical-opportunity windows. Evenings are social and unreliable, so they are avoided. Tasks are spread across days rather than stacked."}
