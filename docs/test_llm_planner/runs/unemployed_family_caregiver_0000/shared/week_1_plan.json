@@ -1,0 +1,13 @@
+{"placements": [
+{"task": "W1T01", "date": "2026-07-06", "start": "12:00"},
+{"task": "W1T02", "date": "2026-07-07", "start": "18:40"},
+{"task": "W1T03", "date": "2026-07-06", "start": "12:50"},
+{"task": "W1T04", "date": "2026-07-09", "start": "12:45"},
+{"task": "W1T05", "date": "2026-07-08", "start": "12:50"},
+{"task": "W1T06", "date": "2026-07-06", "start": "09:00"},
+{"task": "W1T07", "date": "2026-07-08", "start": "09:10"},
+{"task": "W1T08", "date": "2026-07-08", "start": "09:30"},
+{"task": "W1T09", "date": "2026-07-10", "start": "14:30"},
+{"task": "W1T10", "date": "2026-07-07", "start": "13:00"}
+],
+"lessons": "Assumes a caregiver with fragmented days who follows through best in quiet midday windows (12:00-14:00 marked as psychological capability) and morning slots after the school run flagged as physical opportunity. Light, short tasks are anchored to habitual routines (lunch, early evening). Tasks are spread across days to avoid overload, with no evening placements during low-opportunity periods."}

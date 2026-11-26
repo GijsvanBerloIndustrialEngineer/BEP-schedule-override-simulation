@@ -1,0 +1,19 @@
+{"placements": [
+{"task":"W5T01","date":"2026-08-03","start":"21:20"},
+{"task":"W5T02","date":"2026-08-08","start":"09:00"},
+{"task":"W5T03","date":"2026-08-04","start":"19:00"},
+{"task":"W5T04","date":"2026-08-06","start":"20:30"},
+{"task":"W5T05","date":"2026-08-08","start":"07:00"},
+{"task":"W5T06","date":"2026-08-04","start":"06:20"},
+{"task":"W5T07","date":"2026-08-03","start":"07:00"},
+{"task":"W5T08","date":"2026-08-07","start":"18:10"},
+{"task":"W5T09","date":"2026-08-05","start":"12:40"},
+{"task":"W5T10","date":"2026-08-05","start":"17:50"},
+{"task":"W5T11","date":"2026-08-09","start":"16:00"},
+{"task":"W5T12","date":"2026-08-06","start":"07:40"},
+{"task":"W5T13","date":"2026-08-09","start":"07:00"},
+{"task":"W5T14","date":"2026-08-09","start":"11:00"},
+{"task":"W5T15","date":"2026-08-09","start":"11:30"}
+],
+"lessons": "Assumes she follows through best in early mornings (06:00-08:00) when intention to act is observed and in the habitual 17:30-19:00 slot. Midday around 12:00 shows low self-efficacy, so it is avoided for effortful tasks. Intense workouts are spread across days; long tasks go on the freer weekend; light alongside tasks sit at routine moments."
+}

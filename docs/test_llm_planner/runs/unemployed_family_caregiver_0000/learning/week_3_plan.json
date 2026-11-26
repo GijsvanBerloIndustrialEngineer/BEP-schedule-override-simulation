@@ -1,0 +1,21 @@
+{"placements": [
+{"task":"W3T01","date":"2026-07-24","start":"12:00"},
+{"task":"W3T02","date":"2026-07-23","start":"13:30"},
+{"task":"W3T03","date":"2026-07-22","start":"15:30"},
+{"task":"W3T04","date":"2026-07-20","start":"12:00"},
+{"task":"W3T05","date":"2026-07-23","start":"21:00"},
+{"task":"W3T06","date":"2026-07-24","start":"12:30"},
+{"task":"W3T07","date":"2026-07-20","start":"12:15"},
+{"task":"W3T08","date":"2026-07-20","start":"19:00"},
+{"task":"W3T09","date":"2026-07-23","start":"12:45"},
+{"task":"W3T10","date":"2026-07-22","start":"11:30"},
+{"task":"W3T11","date":"2026-07-22","start":"13:20"},
+{"task":"W3T12","date":"2026-07-22","start":"13:40"},
+{"task":"W3T13","date":"2026-07-20","start":"09:00"},
+{"task":"W3T14","date":"2026-07-21","start":"11:30"},
+{"task":"W3T15","date":"2026-07-21","start":"12:45"},
+{"task":"W3T16","date":"2026-07-21","start":"12:00"},
+{"task":"W3T17","date":"2026-07-22","start":"12:45"},
+{"task":"W3T18","date":"2026-07-20","start":"13:00"}
+],
+"lessons":"Completion is high at midday (12:00-14:00) with psychological capability and physical opportunity, and in afternoons/evenings; mornings and outdoor-context slots were skipped more often. Heavy days still work, so load is not discriminating. I place standalone tasks in midday windows on weekdays, keep intensity-2 walks at midday, anchor alongside tasks to lunch or routines, and avoid weekends and low-opportunity late evenings."}

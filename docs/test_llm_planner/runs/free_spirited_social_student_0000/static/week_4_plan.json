@@ -1,0 +1,14 @@
+{"placements": [
+{"task": "W4T01", "date": "2026-08-02", "start": "10:00"},
+{"task": "W4T02", "date": "2026-08-01", "start": "10:00"},
+{"task": "W4T03", "date": "2026-07-30", "start": "16:30"},
+{"task": "W4T04", "date": "2026-07-31", "start": "14:00"},
+{"task": "W4T05", "date": "2026-07-28", "start": "12:10"},
+{"task": "W4T06", "date": "2026-07-27", "start": "06:30"},
+{"task": "W4T07", "date": "2026-07-29", "start": "14:00"},
+{"task": "W4T08", "date": "2026-08-01", "start": "15:30"},
+{"task": "W4T09", "date": "2026-07-29", "start": "12:10"},
+{"task": "W4T10", "date": "2026-07-28", "start": "18:00"},
+{"task": "W4T11", "date": "2026-08-02", "start": "11:00"}
+],
+"lessons": "Assumes a social student follows through best with physical tasks in observed physical-opportunity windows and in unhurried free blocks (weekend, midday), avoiding social evenings. Short low-intensity tasks go in lunch gaps; walks go in afternoon blocks with physical opportunity; alongside tasks sit in habitual or opportunity times."}
